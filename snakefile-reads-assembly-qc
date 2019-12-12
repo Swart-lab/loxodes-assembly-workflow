@@ -1,0 +1,95 @@
+# Rules for QC and initial annotation of genomic DNAseq reads
+
+import glob # Needed for functions below
+
+rule quast_spades_k127_comb:
+    input:
+        expand("assembly/spades-comb_{sp}_q{qtrimvals}/scaffolds.fasta",sp=config['species'],qtrimvals=config['qtrimvals'])
+    output:
+        "qc/quast_spades_k127_comb/report.html"
+    threads: 16
+    conda: "envs/quast.yml"
+    log: "logs/quast_spades_k127_comb_{wildcards.sp}_q{wildcards.qtrimvals}.log"
+    shell:
+        "quast.py -o qc/quast_spades_k127_comb -t {threads} -m 500 -s -L --large {input} &> {log}"
+
+def get_spades_multiple_input_corr_reads_fwd(wildcards):
+    r1=glob.glob("assembly/spades-comb_"+wildcards.sp+"_q"+wildcards.qtrimvals+"/corrected/*_R12_ktrim_qtrim"+wildcards.qtrimvals+"_1.00.*_0.cor.fastq.gz")
+    r1.sort()
+    return r1
+
+def get_spades_multiple_input_corr_reads_rev(wildcards):
+    r2=glob.glob("assembly/spades-comb_"+wildcards.sp+"_q"+wildcards.qtrimvals+"/corrected/*_R12_ktrim_qtrim"+wildcards.qtrimvals+"_2.00.*_0.cor.fastq.gz")
+    r2.sort()
+    return r2
+
+rule bbmap_covstats_spades_comb:
+    input:
+        scaffolds="assembly/spades-comb_{sp}_q{qtrimvals}/scaffolds.fasta",
+        cor_fwd=get_spades_multiple_input_corr_reads_fwd,
+        cor_rev=get_spades_multiple_input_corr_reads_rev
+    output:
+        "annotation/spades-comb_{sp}_q{qtrimvals}/spades-comb_{sp}_q{qtrimvals}.scaffolds.covstats"
+    threads: 16
+    conda: "envs/bbmap.yml"
+    log: "logs/bbmap_covstats.spades-comb_{sp}_q{qtrimvals}.log"
+    params:
+        inarg=lambda wildcards: ','.join(get_spades_multiple_input_corr_reads_fwd(wildcards)),
+        in2arg=lambda wildcards: ','.join(get_spades_multiple_input_corr_reads_rev(wildcards))
+    shell:
+        "bbwrap.sh -Xmx16g threads={threads} fast=t nodisk minid=0.98 ref={input.scaffolds} in={params.inarg} in2={params.in2arg} covstats={output} &> {log}"
+
+rule bbmap_covstats:
+    input:
+        scaffolds="assembly/{assembler}_{lib}_q{qtrimvals}/scaffolds.fasta",
+        cor_fwd="assembly/{assembler}_{lib}_q{qtrimvals}/corrected/{lib}_R12_ktrim_qtrim{qtrimvals}_1.00.0_0.cor.fastq.gz",
+        cor_rev="assembly/{assembler}_{lib}_q{qtrimvals}/corrected/{lib}_R12_ktrim_qtrim{qtrimvals}_2.00.0_0.cor.fastq.gz"
+    output:
+        "annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.scaffolds.covstats"
+    wildcard_constraints:
+        assembler="[^_]+(?<!comb)" # Negate underscore character so that the assembler and lib wildcards are split properly, negative lookbehind for 'comb' to avoid applying this rule to combined assemblies
+    threads: 16
+    conda: "envs/bbmap.yml"
+    log: "logs/bbmap_covstats.{assembler}_{lib}_q{qtrimvals}.log"
+    shell:
+        "bbmap.sh -Xmx60g threads={threads} fast=t nodisk minid=0.98 ref={input.scaffolds} in={input.cor_fwd} in2={input.cor_rev} covstats={output} &> {log};"
+        "sed -i 's/^#//' {output};" # Strip leading # from header line
+
+rule barrnap:
+    input:
+        "assembly/{assembler}_{lib}_q{qtrimvals}/scaffolds.fasta"
+    output:
+        gff="annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.barrnap.{kingdom}.gff",
+        fasta="annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.barrnap.{kingdom}.fasta"
+    conda: "envs/barrnap.yml"
+    threads: 4
+    log: "logs/barrnap.{assembler}_{lib}_q{qtrimvals}.{kingdom}.log"
+    shell:
+        "barrnap --kingdom {wildcards.kingdom} --threads {threads} {input} > {output.gff} 2> {log};"
+        "bedtools getfasta -fi {input} -bed {output.gff} -fo {output.fasta} 2>> {log}"
+
+rule bandage_rrna_draw:
+    input:
+        fastg="assembly/{assembler}_{lib}_q{qtrimvals}/assembly_graph.fastg",
+        barrnap_fasta="annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.barrnap.{kingdom}.fasta"
+    output:
+        "annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.barrnap.{kingdom}.Bandage.png"
+    conda: "envs/bandage.yml"
+    threads: 1
+    log: "logs/bandage_rrna_draw.{assembler}_{lib}_q{qtrimvals}.{kingdom}.log"
+    shell:
+        "Bandage image {input.fastg} {output} --query {input.barrnap_fasta} --scope aroundblast --distance 5 &> {log}"
+
+rule mt_rrna_hmm:
+    input:
+        "assembly/{assembler}_{lib}_q{qtrimvals}/scaffolds.fasta"
+    output:
+        out="annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.{rrnagene}.nhmmer.out",
+        tblout="annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.{rrnagene}.nhmmer.tblout"
+    conda: "envs/barrnap.yml"
+    log: "logs/mt_rrna_hmm.{assembler}_{lib}_q{qtrimvals}.{rrnagene}.log"
+    params:
+        hmm="resources/mt_rRNA_hmm/ciliate_{rrnagene}.hmm"
+    threads: 4
+    shell:
+        "nhmmer --cpu {threads} --tblout {output.tblout} {params.hmm} {input} > {output.out} 2> {log}"

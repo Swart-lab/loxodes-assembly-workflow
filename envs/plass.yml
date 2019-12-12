@@ -1,0 +1,8 @@
+channels:
+  - biocore
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - bbmap=38.22=h470a237_0
+  - plass=2.c7e35

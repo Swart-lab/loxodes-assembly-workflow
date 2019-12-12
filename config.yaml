@@ -1,0 +1,157 @@
+libraries:
+  #- 3556_A
+  #- 3556_B
+  #- 3556_C
+  - 4090_A
+  - 4090_B
+  - 4090_C
+  - 4090_D
+  - 4090_E
+  - 4090_F
+  - 4091_A
+  - 4091_B
+  - 4091_C
+  - 4091_D
+  - 4091_E
+  - 4091_F
+
+species:
+  - Lstr
+  - Lmag
+
+barrnap_kingdoms:
+  - mito
+  - euk
+  - bac
+
+ciliate_mt_rRNA:
+  - mtSSU
+  - mtLSU
+
+qtrimvals:
+  - 2
+  - 28
+
+libraries_Lstr:
+  illumina-bulk:
+    - 4090_A
+    - 4090_B
+    - 4090_C
+  illumina-sc:
+    - 4091_C
+    - 4091_D
+
+libraries_Lmag:
+  illumina-bulk:
+    - 4090_D
+    - 4090_E
+  illumina-sc:
+    - 4091_E
+    - 4091_F
+
+libraries_lox:
+  - 4090_A
+  - 4090_B
+  - 4090_C
+  - 4090_D
+  - 4090_E
+
+libraries_mg:
+  - 4090_A
+  - 4090_B
+  - 4090_C
+  - 4090_D
+  - 4090_E
+  - 4090_F
+
+libraries_sc:
+  - 4091_A
+  - 4091_B
+  - 4091_C
+  - 4091_D
+  - 4091_E
+  - 4091_F
+
+reads_raw:
+  4090_A:
+    fwd:
+      - data/reads/4090_A_run579_AAGAGGCA_S491_L007_R1_001.fastq.gz
+      - data/reads/gDNA41_1_S1_L002_R1_001.fastq.gz
+    rev:
+      - data/reads/4090_A_run579_AAGAGGCA_S491_L007_R2_001.fastq.gz
+      - data/reads/gDNA41_1_S1_L002_R2_001.fastq.gz
+  4090_B:
+    fwd:
+      - data/reads/4090_B_run579_AAGAGGCA_S492_L007_R1_001.fastq.gz
+      - data/reads/gDNA41_2_S2_L002_R1_001.fastq.gz
+    rev:
+      - data/reads/4090_B_run579_AAGAGGCA_S492_L007_R2_001.fastq.gz
+      - data/reads/gDNA41_2_S2_L002_R2_001.fastq.gz
+  4090_C:
+    fwd:
+      - data/reads/4090_C_run579_AAGAGGCA_S493_L007_R1_001.fastq.gz
+      - data/reads/gDNA41_3_S3_L002_R1_001.fastq.gz
+    rev:
+      - data/reads/4090_C_run579_AAGAGGCA_S493_L007_R2_001.fastq.gz
+      - data/reads/gDNA41_3_S3_L002_R2_001.fastq.gz
+  4090_D:
+    fwd:
+      - data/reads/4090_D_run579_AAGAGGCA_S494_L007_R1_001.fastq.gz
+      - data/reads/gDNA41_4_S4_L002_R1_001.fastq.gz
+    rev:
+      - data/reads/4090_D_run579_AAGAGGCA_S494_L007_R2_001.fastq.gz
+      - data/reads/gDNA41_4_S4_L002_R2_001.fastq.gz
+  4090_E:
+    fwd:
+      - data/reads/4090_E_run579_AAGAGGCA_S495_L007_R1_001.fastq.gz
+      - data/reads/gDNA41_5_S5_L002_R1_001.fastq.gz
+    rev:
+      - data/reads/4090_E_run579_AAGAGGCA_S495_L007_R2_001.fastq.gz
+      - data/reads/gDNA41_5_S5_L002_R2_001.fastq.gz
+  4090_F:
+    fwd:
+      - data/reads/4090_F_run579_AAGAGGCA_S496_L007_R1_001.fastq.gz
+    rev:
+      - data/reads/4090_F_run579_AAGAGGCA_S496_L007_R2_001.fastq.gz
+  4091_A:
+    fwd:
+      - data/reads/4091_A_run579_AAGAGGCA_S427_L005_R1_001.fastq.gz
+      - data/reads/4091_A_run583_AAGAGGCA_S280_L005_R1_001.fastq.gz
+    rev:
+      - data/reads/4091_A_run579_AAGAGGCA_S427_L005_R2_001.fastq.gz
+      - data/reads/4091_A_run583_AAGAGGCA_S280_L005_R2_001.fastq.gz
+  4091_B:
+    fwd:
+      - data/reads/4091_B_run579_AAGAGGCA_S428_L005_R1_001.fastq.gz
+      - data/reads/4091_B_run583_AAGAGGCA_S281_L005_R1_001.fastq.gz
+    rev:
+      - data/reads/4091_B_run579_AAGAGGCA_S428_L005_R2_001.fastq.gz
+      - data/reads/4091_B_run583_AAGAGGCA_S281_L005_R2_001.fastq.gz
+  4091_C:
+    fwd:
+      - data/reads/4091_C_run579_GTAGAGGA_S429_L005_R1_001.fastq.gz
+      - data/reads/4091_C_run583_GTAGAGGA_S282_L005_R1_001.fastq.gz
+    rev:
+      - data/reads/4091_C_run579_GTAGAGGA_S429_L005_R2_001.fastq.gz
+      - data/reads/4091_C_run583_GTAGAGGA_S282_L005_R2_001.fastq.gz
+  4091_D:
+    fwd:
+      - data/reads/4091_D_run579_GTAGAGGA_S430_L005_R1_001.fastq.gz
+      - data/reads/4091_D_run583_GTAGAGGA_S283_L005_R1_001.fastq.gz
+    rev:
+      - data/reads/4091_D_run579_GTAGAGGA_S430_L005_R2_001.fastq.gz
+      - data/reads/4091_D_run583_GTAGAGGA_S283_L005_R2_001.fastq.gz
+  4091_E:
+    fwd:
+      - data/reads/4091_E_run579_GTAGAGGA_S431_L005_R1_001.fastq.gz
+      - data/reads/4091_E_run583_GTAGAGGA_S284_L005_R1_001.fastq.gz
+    rev:
+      - data/reads/4091_E_run579_GTAGAGGA_S431_L005_R2_001.fastq.gz
+      - data/reads/4091_E_run583_GTAGAGGA_S284_L005_R2_001.fastq.gz
+  4091_F:
+    fwd:
+      - data/reads/4091_F_run579_GTAGAGGA_S432_L005_R1_001.fastq.gz
+      - data/reads/4091_F_run583_GTAGAGGA_S285_L005_R1_001.fastq.gz
+    rev:
+      - data/reads/4091_F_run579_GTAGAGGA_S432_L005_R2_001.fastq.gz
+      - data/reads/4091_F_run583_GTAGAGGA_S285_L005_R2_001.fastq.gz

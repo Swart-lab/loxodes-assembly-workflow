@@ -1,0 +1,72 @@
+{
+    "__default__" :
+    {
+        "n" : "16",
+        "mem" : "1",
+        "time" : "1:0:0",
+        "output" : "{rule}.{wildcards}.out",
+        "error" : "{rule}.{wildcards}.err"
+    },
+    "combine_reads" :
+    {
+        "n" : "16",
+        "mem" : "1",
+        "time" : "2:0:0"
+    },
+    "bbduk_qtrim_ktrim" :
+    {
+        "n" : "16",
+        "mem" : "1",
+        "time" : "2:0:0"
+    },
+    "spades_k127_comb" :
+    {
+        "n" : "16",
+        "mem" : "24",
+        "time" : "72:0:0"
+    },
+    "spades_k127_mg" :
+    {
+        "n" : "16",
+        "mem" : "12",
+        "time" : "48:0:0"
+    },
+    "spades_k127_sc" :
+    {
+        "n" : "16",
+        "mem" : "8",
+        "time" : "16:0:0"
+    },
+    "mt_rrna_hmm" :
+    {
+        "n" : "4",
+        "mem" : "1",
+        "time" : "0:30:0"
+    },
+    "phyloflash" :
+    {
+        "n" : "8",
+        "mem" : "1",
+        "time" : "0:30:0"
+    },
+    "bbmap_covstats_spades_comb" :
+    {
+        "n" : "16",
+        "mem" : "2",
+        "time" : "2:0:0"
+    },
+    "bbmap_covstats" :
+    {
+        "n" : "16",
+        "mem" : "4",
+        "mail" : "abe",
+        "time" : "8:0:0"
+    },
+    "plass_mg" :
+    {
+        "n" : "24",
+        "mem" : "10",
+        "time" : "16:0:0",
+        "mail" : "abe"
+    }
+}

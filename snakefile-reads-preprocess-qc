@@ -1,0 +1,48 @@
+# Rules for preprocessing and QC of genomic DNAseq reads
+
+PHYLOFLASH_DBHOME="db/phyloFlash/132"
+
+rule combine_reads:
+    input:
+        # fwd=get_input_reads_fwd,
+        # rev=get_input_reads_rev
+        fwd=lambda wildcards: config['reads_raw'][wildcards.lib]['fwd'],
+        rev=lambda wildcards: config['reads_raw'][wildcards.lib]['rev']
+    output:
+        fwd="data/reads-combine/{lib}_R1.fq.gz",
+        rev="data/reads-combine/{lib}_R2.fq.gz"
+    conda: "envs/bbmap.yml"
+    threads: 8
+    params:
+        # Allocate at least one thread to pigz, otherwise one fewer than total
+        pigzthreads=lambda wildcards, threads: threads - 1 if (threads > 1) else 1
+    shell:
+        "gzip -cd {input.fwd} | pigz -p {params.pigzthreads} -c > {output.fwd};"
+        "gzip -cd {input.rev} | pigz -p {params.pigzthreads} -c > {output.rev};"
+
+rule bbduk_qtrim_ktrim:
+    input:
+        fwd="data/reads-combine/{lib}_R1.fq.gz",
+        rev="data/reads-combine/{lib}_R2.fq.gz"
+    output:
+        "data/reads-trim/{lib}_R12_ktrim_qtrim{qtrimvals}.fq.gz"
+    threads: 8
+    log: "logs/bbduk_qtrim_ktrim.{lib}_q{qtrimvals}.log"
+    conda: "envs/bbmap.yml"
+    shell:
+        "bbduk.sh -Xmx10g ref=resources/adapters.fa,resources/phix174_ill.ref.fa.gz threads={threads} in={input.fwd} in2={input.rev} ktrim=r qtrim=rl trimq={wildcards.qtrimvals} minlength=25 out={output} 2> {log}"
+
+rule phyloflash:
+    input:
+        fwd="data/reads-combine/{lib}_R1.fq.gz",
+        rev="data/reads-combine/{lib}_R2.fq.gz"
+    output:
+        "qc/phyloFlash/{lib}.phyloFlash.tar.gz"
+    threads: 8
+    conda: "envs/phyloFlash.yml"
+    log: "logs/{lib}.phyloFlash.log"
+    params:
+        db=PHYLOFLASH_DBHOME
+    shell:
+        "phyloFlash.pl -lib {wildcards.lib} -readlength 150 -read1 {input.fwd} -read2 {input.rev} -CPUs {threads} -almosteverything -dbhome {params.db} 2> {log};"
+        "mv {wildcards.lib}.phyloFlash* qc/phyloFlash/;"

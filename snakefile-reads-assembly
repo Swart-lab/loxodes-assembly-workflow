@@ -1,0 +1,61 @@
+# Rules for assembly of genomic DNAseq reads
+
+# Combined list of input files for SPAdes combined assembly (metagenome)
+def combine_spades_input_files(wildcards):
+    r12=expand("data/reads-trim/{lib}_R12_ktrim_qtrim{qtrimvals}.fq.gz",
+               lib=config['_'.join(['libraries',wildcards.sp])]['illumina-bulk'],
+               qtrimvals=wildcards.qtrimvals)
+    r12.sort()
+    inargs=[]
+    for i in range(len(r12)):
+        inargs.append(''.join(['--pe',str(i+1),'-12 ',r12[i]]))
+    inargs.sort()
+    return ' '.join(inargs)
+
+rule spades_k127_comb:
+    # Combined assembly for each species, using all metagenomic libraries available for that species
+    input:
+        lambda wildcards: expand("data/reads-trim/{lib}_R12_ktrim_qtrim{qtrimvals}.fq.gz",lib=config['_'.join(['libraries',wildcards.sp])]['illumina-bulk'],qtrimvals=wildcards.qtrimvals)
+    output:
+        scaffolds="assembly/spades-comb_{sp}_q{qtrimvals}/scaffolds.fasta",
+        fastg="assembly/spades-comb_{sp}_q{qtrimvals}/assembly_graph.fastg"
+    threads: 16
+    conda: "envs/spades.yml"
+    log: "logs/spades_127_comb_{sp}_q{qtrimvals}.log"
+    params:
+        pe_inargs=combine_spades_input_files
+    shell:
+        "spades.py {params.pe_inargs} -o assembly/spades-comb_{wildcards.sp}_q{wildcards.qtrimvals} --threads {threads} --memory 380 -k 21,33,55,77,99,127 &> {log};"
+        "rm -r assembly/spades-comb_{wildcards.sp}_q{wildcards.qtrimvals}/split_input;"
+
+rule spades_k127_sc:
+    # Individual assembly of each single-cell Illumina library
+    input:
+        "data/reads-trim/{lib_sc}_R12_ktrim_qtrim{qtrimvals}.fq.gz"
+    output:
+    # Output files have to be prefixed spades-sc with hyphen, to avoid
+    # wildcard matching mistaking 'sc' as part of the {lib_sc} wildcard
+        scaffolds="assembly/spades-sc_{lib_sc}_q{qtrimvals}/scaffolds.fasta",
+        fastg="assembly/spades-sc_{lib_sc}_q{qtrimvals}/assembly_graph.fastg",
+        cor_fwd="assembly/spades-sc_{lib_sc}_q{qtrimvals}/corrected/{lib_sc}_R12_ktrim_qtrim{qtrimvals}_1.00.0_0.cor.fastq.gz",
+        cor_rev="assembly/spades-sc_{lib_sc}_q{qtrimvals}/corrected/{lib_sc}_R12_ktrim_qtrim{qtrimvals}_2.00.0_0.cor.fastq.gz"
+    threads: 16
+    conda: "envs/spades.yml"
+    log: "logs/spades_127-sc.{lib_sc}.q{qtrimvals}.log"
+    shell:
+        "spades.py --sc --12 {input} -o assembly/spades-sc_{wildcards.lib_sc}_q{wildcards.qtrimvals} --threads {threads} --memory 100 -k 21,33,55,77,99,127 &> {log}"
+
+rule spades_k127_mg:
+    # Individual assembly of each metagenomic Illumina library
+    input:
+        "data/reads-trim/{lib_mg}_R12_ktrim_qtrim{qtrimvals}.fq.gz"
+    output:
+        scaffolds="assembly/spades_{lib_mg}_q{qtrimvals}/scaffolds.fasta",
+        fastg="assembly/spades_{lib_mg}_q{qtrimvals}/assembly_graph.fastg",
+        cor_fwd="assembly/spades_{lib_mg}_q{qtrimvals}/corrected/{lib_mg}_R12_ktrim_qtrim{qtrimvals}_1.00.0_0.cor.fastq.gz",
+        cor_rev="assembly/spades_{lib_mg}_q{qtrimvals}/corrected/{lib_mg}_R12_ktrim_qtrim{qtrimvals}_2.00.0_0.cor.fastq.gz"
+    threads: 16
+    conda: "envs/spades.yml"
+    log: "logs/spades_127.{lib_mg}.q{qtrimvals}.log"
+    shell:
+        "spades.py --12 {input} -o assembly/spades_{wildcards.lib_mg}_q{wildcards.qtrimvals} --threads {threads} --memory 190 -k 21,33,55,77,99,127 &> {log}"
