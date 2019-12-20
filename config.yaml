@@ -72,6 +72,14 @@ libraries_sc:
   - 4091_E
   - 4091_F
 
+libraries_rnaseq:
+  - 4305_A
+  - 4305_B
+  - 4305_C
+  - 4305_D
+  - 4305_E
+  - 4305_F
+
 reads_raw:
   4090_A:
     fwd:
@@ -155,3 +163,46 @@ reads_raw:
     rev:
       - data/reads/4091_F_run579_GTAGAGGA_S432_L005_R2_001.fastq.gz
       - data/reads/4091_F_run583_GTAGAGGA_S285_L005_R2_001.fastq.gz
+
+reads_rnaseq_raw:
+  4305_A:
+    fwd:
+      - data/reads-rnaseq/4305_A_run623_TAGCTTGT_S88_L003_R1_001.fastq.gz
+      - data/reads-rnaseq/4305_A_run625_TAGCTTGT_S15_L003_R1_001.fastq.gz
+    rev:
+      - data/reads-rnaseq/4305_A_run623_TAGCTTGT_S88_L003_R2_001.fastq.gz
+      - data/reads-rnaseq/4305_A_run625_TAGCTTGT_S15_L003_R2_001.fastq.gz
+  4305_B:
+    fwd:
+      - data/reads-rnaseq/4305_B_run623_ACTTGATG_S89_L003_R1_001.fastq.gz
+      - data/reads-rnaseq/4305_B_run625_ACTTGATG_S16_L003_R1_001.fastq.gz
+    rev:
+      - data/reads-rnaseq/4305_B_run623_ACTTGATG_S89_L003_R2_001.fastq.gz
+      - data/reads-rnaseq/4305_B_run625_ACTTGATG_S16_L003_R2_001.fastq.gz
+  4305_C:
+    fwd:
+      - data/reads-rnaseq/4305_C_run623_TCGAGCGT_S90_L003_R1_001.fastq.gz
+      - data/reads-rnaseq/4305_C_run625_TCGAGCGT_S17_L003_R1_001.fastq.gz
+    rev:
+      - data/reads-rnaseq/4305_C_run623_TCGAGCGT_S90_L003_R2_001.fastq.gz
+      - data/reads-rnaseq/4305_C_run625_TCGAGCGT_S17_L003_R2_001.fastq.gz
+  4305_D:
+    fwd:
+      - data/reads-rnaseq/4305_D_run623_TAGTCTTG_S91_L003_R1_001.fastq.gz
+      - data/reads-rnaseq/4305_D_run625_TAGTCTTG_S18_L003_R1_001.fastq.gz
+    rev:
+      - data/reads-rnaseq/4305_D_run623_TAGTCTTG_S91_L003_R2_001.fastq.gz
+      - data/reads-rnaseq/4305_D_run625_TAGTCTTG_S18_L003_R2_001.fastq.gz
+  4305_E:
+    fwd:
+      - data/reads-rnaseq/4305_E_run623_TCCAGTCG_S92_L003_R1_001.fastq.gz
+      - data/reads-rnaseq/4305_E_run625_TCCAGTCG_S19_L003_R1_001.fastq.gz
+    rev:
+      - data/reads-rnaseq/4305_E_run623_TCCAGTCG_S92_L003_R2_001.fastq.gz
+      - data/reads-rnaseq/4305_E_run625_TCCAGTCG_S19_L003_R2_001.fastq.gz
+  4305_F:
+    fwd:
+      - data/reads-rnaseq/4305_F_run623_TTACTCGC_S93_L003_R1_001.fastq.gz
+    rev:
+      - data/reads-rnaseq/4305_F_run623_TTACTCGC_S93_L003_R2_001.fastq.gz
+

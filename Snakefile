@@ -1,24 +1,21 @@
 include: "snakefile-reads-assembly-qc"
 include: "snakefile-reads-assembly"
 include: "snakefile-reads-preprocess-qc"
+include: "snakefile-reads-rnaseq-preprocess-qc"
 
 rule annotation_spades_comb:
     input:
         expand("annotation/spades-comb_{sp}_q{qtrimvals}/spades-comb_{sp}_q{qtrimvals}.scaffolds.covstats",
                sp=config['species'],
-#               qtrimvals=config['qtrimvals']),
                qtrimvals=28),
         expand("annotation/spades-comb_{sp}_q{qtrimvals}/spades-comb_{sp}_q{qtrimvals}.barrnap.{kingdom}.Bandage.png",
                sp=config['species'],
-#               qtrimvals=config['qtrimvals'],
                qtrimvals=28,
                kingdom=config['barrnap_kingdoms']),
         expand("annotation/spades-comb_{sp}_q{qtrimvals}/spades-comb_{sp}_q{qtrimvals}.{rrnagene}.nhmmer.out",
                sp=config['species'],
                rrnagene=config['ciliate_mt_rRNA'],
                qtrimvals=28),
-#               qtrimvals=config['qtrimvals']),
-#        "qc/quast_spades_k127_comb/report.html"
         expand("annotation/spades-comb_{sp}_q{qtrimvals}/spades-comb_{sp}_q{qtrimvals}.cds-dens.tsv",
                sp=config['species'],
                qtrimvals=28)
@@ -66,3 +63,11 @@ rule assembly:
 rule qc:
     input:
         expand("qc/phyloFlash/{lib}.phyloFlash.tar.gz",lib=config["libraries"])
+
+rule rnaseq_qc:
+    input:
+        expand("qc/phyloFlash_rnaseq/{lib}.phyloFlash.tar.gz",lib=config["libraries_rnaseq"])
+
+rule rnaseq_trim:
+    input:
+        expand("data/reads-rnaseq-trim/{lib}_R12_ktrim_qtrim{qtrimvals}.fq.gz",lib=config["libraries_rnaseq"],qtrimvals=[28])
