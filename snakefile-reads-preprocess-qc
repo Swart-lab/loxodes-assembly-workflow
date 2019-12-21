@@ -3,9 +3,8 @@
 PHYLOFLASH_DBHOME="db/phyloFlash/132"
 
 rule combine_reads:
+    # Combine reads from multiple runs belonging to the same libraries
     input:
-        # fwd=get_input_reads_fwd,
-        # rev=get_input_reads_rev
         fwd=lambda wildcards: config['reads_raw'][wildcards.lib]['fwd'],
         rev=lambda wildcards: config['reads_raw'][wildcards.lib]['rev']
     output:
@@ -21,6 +20,7 @@ rule combine_reads:
         "gzip -cd {input.rev} | pigz -p {params.pigzthreads} -c > {output.rev};"
 
 rule bbduk_qtrim_ktrim:
+    # Kmer trim adapters and quality trim reads 
     input:
         fwd="data/reads-combine/{lib}_R1.fq.gz",
         rev="data/reads-combine/{lib}_R2.fq.gz"
@@ -33,6 +33,7 @@ rule bbduk_qtrim_ktrim:
         "bbduk.sh -Xmx10g ref=resources/adapters.fa,resources/phix174_ill.ref.fa.gz threads={threads} in={input.fwd} in2={input.rev} ktrim=r qtrim=rl trimq={wildcards.qtrimvals} minlength=25 out={output} 2> {log}"
 
 rule phyloflash:
+    # QC for taxonomic composition of read library, expect to have contaminants especially bacteria and food algae
     input:
         fwd="data/reads-combine/{lib}_R1.fq.gz",
         rev="data/reads-combine/{lib}_R2.fq.gz"

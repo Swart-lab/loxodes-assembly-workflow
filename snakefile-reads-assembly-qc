@@ -3,6 +3,7 @@
 import glob # Needed for functions below
 
 rule quast_spades_k127_comb:
+    # Quality metrics of combined assembly
     input:
         expand("assembly/spades-comb_{sp}_q{qtrimvals}/scaffolds.fasta",sp=config['species'],qtrimvals=config['qtrimvals'])
     output:
@@ -24,6 +25,7 @@ def get_spades_multiple_input_corr_reads_rev(wildcards):
     return r2
 
 rule bbmap_covstats_spades_comb:
+    # Coverage stats of combined assembly, required for GC-coverage plot
     input:
         scaffolds="assembly/spades-comb_{sp}_q{qtrimvals}/scaffolds.fasta",
         cor_fwd=get_spades_multiple_input_corr_reads_fwd,
@@ -40,6 +42,7 @@ rule bbmap_covstats_spades_comb:
         "bbwrap.sh -Xmx16g threads={threads} fast=t nodisk minid=0.98 ref={input.scaffolds} in={params.inarg} in2={params.in2arg} covstats={output} &> {log}"
 
 rule bbmap_covstats:
+    # Coverage stats of individual assemblies, required for GC-coverage plot
     input:
         scaffolds="assembly/{assembler}_{lib}_q{qtrimvals}/scaffolds.fasta",
         cor_fwd="assembly/{assembler}_{lib}_q{qtrimvals}/corrected/{lib}_R12_ktrim_qtrim{qtrimvals}_1.00.0_0.cor.fastq.gz",
@@ -56,6 +59,7 @@ rule bbmap_covstats:
         "sed -i 's/^#//' {output};" # Strip leading # from header line
 
 rule barrnap:
+    # Screen assembly for rRNA genes
     input:
         "assembly/{assembler}_{lib}_q{qtrimvals}/scaffolds.fasta"
     output:
@@ -69,6 +73,8 @@ rule barrnap:
         "bedtools getfasta -fi {input} -bed {output.gff} -fo {output.fasta} 2>> {log}"
 
 rule bandage_rrna_draw:
+    # From assembly graph draw contigs connected to identified rRNA sequences
+    # to see if bacterial genomes/contigs can be pulled out
     input:
         fastg="assembly/{assembler}_{lib}_q{qtrimvals}/assembly_graph.fastg",
         barrnap_fasta="annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.barrnap.{kingdom}.fasta"
@@ -81,6 +87,7 @@ rule bandage_rrna_draw:
         "Bandage image {input.fastg} {output} --query {input.barrnap_fasta} --scope aroundblast --distance 5 &> {log}"
 
 rule mt_rrna_hmm:
+    # Scan for ciliate mt rRNA sequences using custom HMM
     input:
         "assembly/{assembler}_{lib}_q{qtrimvals}/scaffolds.fasta"
     output:

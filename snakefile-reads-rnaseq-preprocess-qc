@@ -3,9 +3,8 @@
 PHYLOFLASH_DBHOME="db/phyloFlash/132"
 
 rule combine_reads_rnaseq:
+    # Combine read files of several runs from the same library into single file
     input:
-        # fwd=get_input_reads_fwd,
-        # rev=get_input_reads_rev
         fwd=lambda wildcards: config['reads_rnaseq_raw'][wildcards.lib]['fwd'],
         rev=lambda wildcards: config['reads_rnaseq_raw'][wildcards.lib]['rev']
     output:
@@ -21,6 +20,7 @@ rule combine_reads_rnaseq:
         "gzip -cd {input.rev} | pigz -p {params.pigzthreads} -c > {output.rev};"
 
 rule bbduk_qtrim_ktrim_rnaseq:
+    # Adapter kmer-trim and quality trim reads
     input:
         fwd="data/reads-rnaseq-combine/{lib}_R1.fq.gz",
         rev="data/reads-rnaseq-combine/{lib}_R2.fq.gz"
@@ -33,6 +33,7 @@ rule bbduk_qtrim_ktrim_rnaseq:
         "bbduk.sh -Xmx10g ref=resources/adapters.fa,resources/phix174_ill.ref.fa.gz threads={threads} in={input.fwd} in2={input.rev} ktrim=r qtrim=rl trimq={wildcards.qtrimvals} minlength=25 out={output} 2> {log}"
 
 rule phyloflash_rnaseq:
+    # Screen each read library for potential contamination, e.g. from food algae and bacteria
     input:
         fwd="data/reads-rnaseq-combine/{lib}_R1.fq.gz",
         rev="data/reads-rnaseq-combine/{lib}_R2.fq.gz"
@@ -49,6 +50,7 @@ rule phyloflash_rnaseq:
         "mv {wildcards.lib}.phyloFlash* qc/phyloFlash_rnaseq/;"
 
 rule filter_rnaseq_chlamy:
+    # Filter out reads that map to Chlamydomonas food algae, the main eukaryotic contaminant expected
     input: "data/reads-rnaseq-trim/{lib}_R12_ktrim_qtrim{qtrimvals}.fq.gz"
     threads: 8
     conda: "envs/bbmap.yml"
@@ -63,6 +65,7 @@ rule filter_rnaseq_chlamy:
         "bbmap.sh -Xmx40g nodisk=t minid=0.98 interleaved=t threads={threads} ref={params.ref} in={input} outu={output.outu} outm={output.outm} scafstats={output.scafstats}"
 
 rule split_filter_rnaseq_chlamy_reads:
+    # Split interleaved reads, required for subsequent input to Trinity assembler
     input: "data/reads-rnaseq-filter/{lib}_R12_ktrim_qtrim{qtrimvals}_bbmap_nochlamy.R12.fq.gz"
     threads: 8
     conda: "envs/bbmap.yml"
