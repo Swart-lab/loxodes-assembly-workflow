@@ -13,10 +13,28 @@
         "mem" : "1",
         "time" : "2:0:0"
     },
+    "combine_reads_rnaseq" :
+    {
+        "n" : "16",
+        "mem" : "1",
+        "time" : "2:0:0"
+    },
     "bbduk_qtrim_ktrim" :
     {
         "n" : "16",
         "mem" : "1",
+        "time" : "2:0:0"
+    },
+    "bbduk_qtrim_ktrim_rnaseq" :
+    {
+        "n" : "16",
+        "mem" : "1",
+        "time" : "2:0:0"
+    },
+    "filter_rnaseq_chlamy" :
+    {
+        "n" : "8",
+        "mem" : "10",
         "time" : "2:0:0"
     },
     "spades_k127_comb" :
@@ -37,6 +55,12 @@
         "mem" : "8",
         "time" : "16:0:0"
     },
+    "trinity_rnaseq_nochlamy" :
+    {
+        "n" : "16",
+        "mem" : "8",
+        "time" : "16:0:0"
+    }
     "mt_rrna_hmm" :
     {
         "n" : "4",
@@ -47,6 +71,12 @@
     {
         "n" : "8",
         "mem" : "1",
+        "time" : "0:30:0"
+    },
+     "phyloflash_rnaseq" :
+    {
+        "n" : "8",
+        "mem" : "5",
         "time" : "0:30:0"
     },
     "bbmap_covstats_spades_comb" :

@@ -47,3 +47,17 @@ rule phyloflash_rnaseq:
     shell:
         "phyloFlash.pl -lib {wildcards.lib} -readlength 150 -read1 {input.fwd} -read2 {input.rev} -readlimit {params.readlimit} -CPUs {threads} -almosteverything -dbhome {params.db} 2> {log};"
         "mv {wildcards.lib}.phyloFlash* qc/phyloFlash_rnaseq/;"
+
+rule filter_rnaseq_chlamy:
+    input: "data/reads-rnaseq-trim/{lib}_R12_ktrim_qtrim{qtrimvals}.fq.gz"
+    threads: 8
+    conda: "envs/bbmap.yml"
+    output:
+        outu="data/reads-rnaseq-filter/{lib}_R12_ktrim_qtrim{qtrimvals}_bbmap_nochlamy.R12.fq.gz",
+        outm="data/reads-rnaseq-filter/{lib}_R12_ktrim_qtrim{qtrimvals}_bbmap_chlamy.R12.bam",
+        scafstats="data/reads-rnaseq-filter/{lib}_R12_ktrim_qtrim{qtrimvals}_bbmap_nochlamy.scafstats"
+    log: "logs/filter_rnaseq_chlamy.{lib}.q{qtrimvals}.log"
+    params: 
+        ref="db/chlamydomonas/Creinhardtii/v5.6/assembly/Creinhardtii_281_v5.0.fa"
+    shell:
+        "bbmap.sh -Xmx40g nodisk=t minid=0.98 interleaved=t threads={threads} ref={params.ref} in={input} outu={output.outu} outm={output.outm} scafstats={output.scafstats}"

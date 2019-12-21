@@ -68,6 +68,10 @@ rule rnaseq_qc:
     input:
         expand("qc/phyloFlash_rnaseq/{lib}.phyloFlash.tar.gz",lib=config["libraries_rnaseq"])
 
-rule rnaseq_trim:
+# rule rnaseq_trim:
+#     input:
+#         expand("data/reads-rnaseq-trim/{lib}_R12_ktrim_qtrim{qtrimvals}.fq.gz",lib=config["libraries_rnaseq"],qtrimvals=[28])
+
+rule rnaseq_filter:
     input:
-        expand("data/reads-rnaseq-trim/{lib}_R12_ktrim_qtrim{qtrimvals}.fq.gz",lib=config["libraries_rnaseq"],qtrimvals=[28])
+        expand("data/reads-rnaseq-filter/{lib}_R12_ktrim_qtrim{qtrimvals}_bbmap_nochlamy.R12.fq.gz",lib=config["libraries_rnaseq"],qtrimvals=[28])
