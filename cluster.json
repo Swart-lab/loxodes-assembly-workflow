@@ -60,7 +60,7 @@
         "n" : "16",
         "mem" : "8",
         "time" : "16:0:0"
-    }
+    },
     "mt_rrna_hmm" :
     {
         "n" : "4",
@@ -78,6 +78,12 @@
         "n" : "8",
         "mem" : "5",
         "time" : "0:30:0"
+    },
+    "split_filter_rnaseq_chlamy_reads" :
+    {
+        "n" : "8",
+        "mem" : "2",
+        "time" : "1:0:0"
     },
     "bbmap_covstats_spades_comb" :
     {
