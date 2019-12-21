@@ -61,3 +61,14 @@ rule filter_rnaseq_chlamy:
         ref="db/chlamydomonas/Creinhardtii/v5.6/assembly/Creinhardtii_281_v5.0.fa"
     shell:
         "bbmap.sh -Xmx40g nodisk=t minid=0.98 interleaved=t threads={threads} ref={params.ref} in={input} outu={output.outu} outm={output.outm} scafstats={output.scafstats}"
+
+rule split_filter_rnaseq_chlamy_reads:
+    input: "data/reads-rnaseq-filter/{lib}_R12_ktrim_qtrim{qtrimvals}_bbmap_nochlamy.R12.fq.gz"
+    threads: 8
+    conda: "envs/bbmap.yml"
+    output:
+        readf="data/reads-rnaseq-filter/{lib}_R12_ktrim_qtrim{qtrimvals}_bbmap_nochlamy.R1.fq.gz",
+        readr="data/reads-rnaseq-filter/{lib}_R12_ktrim_qtrim{qtrimvals}_bbmap_nochlamy.R2.fq.gz"
+    log: "logs/split_filter_rnaseq_chlamy_reads.{lib}.q{qtrimvals}.log"
+    shell:
+        "reformat.sh -Xmx10g threads={threads} interleaved=t in={input} out={output.readf} out2={output.readr}"
