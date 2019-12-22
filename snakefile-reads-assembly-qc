@@ -39,7 +39,7 @@ rule bbmap_covstats_spades_comb:
         inarg=lambda wildcards: ','.join(get_spades_multiple_input_corr_reads_fwd(wildcards)),
         in2arg=lambda wildcards: ','.join(get_spades_multiple_input_corr_reads_rev(wildcards))
     shell:
-        "bbwrap.sh -Xmx16g threads={threads} fast=t nodisk minid=0.98 ref={input.scaffolds} in={params.inarg} in2={params.in2arg} covstats={output} &> {log}"
+        "bbwrap.sh -Xmx24g threads={threads} fast=t nodisk minid=0.98 ref={input.scaffolds} in={params.inarg} in2={params.in2arg} covstats={output} &> {log}"
 
 rule bbmap_covstats:
     # Coverage stats of individual assemblies, required for GC-coverage plot
@@ -100,3 +100,24 @@ rule mt_rrna_hmm:
     threads: 4
     shell:
         "nhmmer --cpu {threads} --tblout {output.tblout} {params.hmm} {input} > {output.out} 2> {log}"
+
+rule prodigal_for_cds_dens:
+    input:
+        "assembly/{assembler}_{lib}_q{qtrimvals}/scaffolds.fasta"
+    output:
+        "annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.prodigal.gff"
+    conda: "envs/prodigal.yml"
+    threads: 16
+    shell:
+        "cat {input} | parallel --gnu -j {threads} --recstart '>' -N 100 --pipe prodigal -f gff -p meta -g 11 > {output}"
+
+rule calculate_cds_dens:
+    input:
+        assembly="assembly/{assembler}_{lib}_q{qtrimvals}/scaffolds.fasta",
+        gff="annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.prodigal.gff"
+    output:
+        "annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.cds-dens.tsv"
+    params:
+        prefix="annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}"
+    shell:
+        "perl code/bin_by_coding_density.pl --in {input.assembly} --gff {input.gff} --out {params.prefix} --no-fasta"

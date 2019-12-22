@@ -88,8 +88,8 @@
     "bbmap_covstats_spades_comb" :
     {
         "n" : "16",
-        "mem" : "2",
-        "time" : "2:0:0"
+        "mem" : "4",
+        "time" : "16:0:0"
     },
     "bbmap_covstats" :
     {
