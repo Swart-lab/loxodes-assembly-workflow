@@ -74,6 +74,24 @@ rule bowtie_build_spades_comb:
         "touch annotation/spades-comb_{wildcards.sp}_q{wildcards.qtrimvals}/mapping/DO_NOT_BACKUP_THIS_FOLDER;"
         "bowtie2-build --threads {threads} --seed {params.seed} {input.scaffolds} {params.prefix} &> {log}"
 
+rule bowtie_build_indiv:
+    # Build bowtie database of individual assembly, required for mapping
+    input:
+        scaffolds="assembly/{assembler}_{lib}_q{qtrimvals}/scaffolds.fasta"
+    output:
+        "annotation/{assembler}_{lib}_q{qtrimvals}/mapping/{assembler}_{lib}_q{qtrimvals}.1.bt2"
+    conda: "envs/bowtie2.yml"
+    wildcard_constraints:
+        assembler="[^_]+(?<!comb)" # Negate underscore character so that the assembler and lib wildcards are split properly, negative lookbehind for 'comb' to avoid applying this rule to combined assemblies
+    threads: 16
+    log: "logs/bowtie_build_indiv.{assembler}.{lib}_q{qtrimvals}.log"
+    params:
+        prefix="annotation/{assembler}_{lib}_q{qtrimvals}/mapping/{assembler}_{lib}_q{qtrimvals}",
+        seed=12345
+    shell:
+        "touch annotation/{wildcards.assembler}_{wildcards.lib}_q{wildcards.qtrimvals}/mapping/DO_NOT_BACKUP_THIS_FOLDER;"
+        "bowtie2-build --threads {threads} --seed {params.seed} {input.scaffolds} {params.prefix} &> {log}"
+
 rule bowtie_map_spades_comb:
     # Map combined assembly with bowtie2
     input:
@@ -95,6 +113,32 @@ rule bowtie_map_spades_comb:
         "bowtie2 --very-fast --no-unal --threads {threads} -x {params.prefix} -1 {params.inarg} -2 {params.in2arg} | samtools view -bS > {output.bam};"
         "samtools sort --threads 16 -o {output.bamsort} --reference {input.scaffolds} {output.bam};"
 
+rule bowtie_map_indiv:
+    # Map individual assembly with bowtie2
+    input:
+        # scaffolds="assembly/spades-comb_{sp}_q{qtrimvals}/scaffolds.fasta",
+        scaffolds="assembly/{assembler}_{lib}_q{qtrimvals}/scaffolds.fasta",
+        bt2_index1="annotation/{assembler}_{lib}_q{qtrimvals}/mapping/{assembler}_{lib}_q{qtrimvals}.1.bt2",
+        cor_fwd="assembly/{assembler}_{lib}_q{qtrimvals}/corrected/{lib}_R12_ktrim_qtrim{qtrimvals}_1.00.0_0.cor.fastq.gz",
+        cor_rev="assembly/{assembler}_{lib}_q{qtrimvals}/corrected/{lib}_R12_ktrim_qtrim{qtrimvals}_2.00.0_0.cor.fastq.gz"
+        # cor_fwd=get_spades_multiple_input_corr_reads_fwd,
+        # cor_rev=get_spades_multiple_input_corr_reads_rev
+    output:
+        bam="annotation/{assembler}_{lib}_q{qtrimvals}/mapping/{assembler}_{lib}_q{qtrimvals}.bam",
+        bamsort="annotation/{assembler}_{lib}_q{qtrimvals}/mapping/{assembler}_{lib}_q{qtrimvals}.sort.bam"
+    log: "logs/bowtie_map_indiv.{assembler}.{lib}_q{qtrimvals}.log"
+    threads: 16
+    conda: "envs/bowtie2.yml"
+    wildcard_constraints:
+        assembler="[^_]+(?<!comb)" # Negate underscore character so that the assembler and lib wildcards are split properly, negative lookbehind for 'comb' to avoid applying this rule to combined assemblies
+    params:
+        prefix="annotation/{assembler}_{lib}_q{qtrimvals}/mapping/{assembler}_{lib}_q{qtrimvals}"
+        # inarg=lambda wildcards: ','.join(get_spades_multiple_input_corr_reads_fwd(wildcards)),
+        # in2arg=lambda wildcards: ','.join(get_spades_multiple_input_corr_reads_rev(wildcards))
+    shell:
+        "bowtie2 --very-fast --no-unal --threads {threads} -x {params.prefix} -1 {input.cor_fwd} -2 {input.cor_rev} | samtools view -bS > {output.bam};"
+        "samtools sort --threads 16 -o {output.bamsort} --reference {input.scaffolds} {output.bam};"
+
 rule bowtie_map_spades_comb_samtools_depth:
     # Get coverage from sorted BAM file of bowtie2 mapping reads to combined metagenomic assemblies
     input:
@@ -108,6 +152,21 @@ rule bowtie_map_spades_comb_samtools_depth:
     shell:
         "samtools depth -a --reference {input.scaffolds} -o {output} {input.bamsort} &> {log}"
 
+rule bowtie_map_indiv_samtools_depth:
+    # Get coverage from sorted BAM file of bowtie2 mapping reads to combined metagenomic assemblies
+    input:
+        scaffolds="assembly/{assembler}_{lib}_q{qtrimvals}/scaffolds.fasta",
+        bamsort="annotation/{assembler}_{lib}_q{qtrimvals}/mapping/{assembler}_{lib}_q{qtrimvals}.sort.bam"
+    output:
+        "annotation/{assembler}_{lib}_q{qtrimvals}/mapping/{assembler}_{lib}_q{qtrimvals}.bt2.depth"
+    log: "logs/bowtie_map_indiv_samtools_depth.{assembler}.{lib}_q{qtrimvals}.log"
+    threads: 2
+    conda: "envs/bowtie2.yml"
+    wildcard_constraints:
+        assembler="[^_]+(?<!comb)" # Negate underscore character so that the assembler and lib wildcards are split properly, negative lookbehind for 'comb' to avoid applying this rule to combined assemblies
+    shell:
+        "samtools depth -a --reference {input.scaffolds} -o {output} {input.bamsort} &> {log}"
+
 rule bowtie_map_spades_comb_covstats:
     # Convert samtools depth file to covstats-like file
     input:
@@ -116,6 +175,18 @@ rule bowtie_map_spades_comb_covstats:
     output:
         "annotation/spades-comb_{sp}_q{qtrimvals}/spades-comb_{sp}_q{qtrimvals}.bt2.covstats"
     log: "logs/bowtie_map_spades_comb_covstats.{sp}_q{qtrimvals}.log"
+    threads: 2
+    shell:
+        "python3 code/samtools_depth_to_covstats.py --depth {input.depth} --fasta {input.scaffolds} --out {output} --log {log}"
+
+rule bowtie_map_indiv_covstats:
+    # Convert samtools depth file to covstats-like file
+    input:
+        depth="annotation/{assembler}_{lib}_q{qtrimvals}/mapping/{assembler}_{lib}_q{qtrimvals}.bt2.depth",
+        scaffolds="assembly/{assembler}_{lib}_q{qtrimvals}/scaffolds.fasta"
+    output:
+        "annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.bt2.covstats"
+    log: "logs/bowtie_map_indiv_covstats.{assembler}.{lib}_q{qtrimvals}.log"
     threads: 2
     shell:
         "python3 code/samtools_depth_to_covstats.py --depth {input.depth} --fasta {input.scaffolds} --out {output} --log {log}"

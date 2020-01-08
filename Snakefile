@@ -25,25 +25,27 @@ rule annotation_spades_comb:
                sp=config['species'],
                qtrimvals=[28])
 
-rule annotation_spades:
-    # Annotate each bulk metagenomic assembly
-    input:
-        expand("annotation/spades_{lib}_q{qtrimvals}/spades_{lib}_q{qtrimvals}.scaffolds.covstats",
-               lib=config['libraries_mg'],
-               qtrimvals=config['qtrimvals']),
-        expand("annotation/spades_{lib}_q{qtrimvals}/spades_{lib}_q{qtrimvals}.barrnap.{kingdom}.Bandage.png",
-               lib=config['libraries_mg'],
-               qtrimvals=config['qtrimvals'],
-               kingdom=config['barrnap_kingdoms']),
-        expand("annotation/spades_{lib}_q{qtrimvals}/spades_{lib}_q{qtrimvals}.{rrnagene}.nhmmer.out",
-               lib=config['libraries_mg'],
-               rrnagene=config['ciliate_mt_rRNA'],
-               qtrimvals=config['qtrimvals'])
+# rule annotation_spades:
+#     # Annotate each bulk metagenomic assembly
+#     input:
+#         # expand("annotation/spades_{lib}_q{qtrimvals}/spades_{lib}_q{qtrimvals}.scaffolds.covstats",
+#         expand("annotation/spades_{lib}_q{qtrimvals}/spades_{lib}_q{qtrimvals}.bt2.blobplot.png",
+#                lib=config['libraries_mg'],
+#                qtrimvals=config['qtrimvals']),
+#         expand("annotation/spades_{lib}_q{qtrimvals}/spades_{lib}_q{qtrimvals}.barrnap.{kingdom}.Bandage.png",
+#                lib=config['libraries_mg'],
+#                qtrimvals=config['qtrimvals'],
+#                kingdom=config['barrnap_kingdoms']),
+#         expand("annotation/spades_{lib}_q{qtrimvals}/spades_{lib}_q{qtrimvals}.{rrnagene}.nhmmer.out",
+#                lib=config['libraries_mg'],
+#                rrnagene=config['ciliate_mt_rRNA'],
+#                qtrimvals=config['qtrimvals'])
 
 rule annotation_spades_sc:
     # Annotate each single-cell MDA assembly
     input:
-        expand("annotation/spades-sc_{lib}_q{qtrimvals}/spades-sc_{lib}_q{qtrimvals}.scaffolds.covstats",
+        # expand("annotation/spades-sc_{lib}_q{qtrimvals}/spades-sc_{lib}_q{qtrimvals}.scaffolds.covstats",
+        expand("annotation/spades-sc_{lib}_q{qtrimvals}/spades-sc_{lib}_q{qtrimvals}.bt2.blobplot.png",
                lib=config['libraries_sc'],
                qtrimvals=config['qtrimvals']),
         expand("annotation/spades-sc_{lib}_q{qtrimvals}/spades-sc_{lib}_q{qtrimvals}.barrnap.{kingdom}.Bandage.png",
