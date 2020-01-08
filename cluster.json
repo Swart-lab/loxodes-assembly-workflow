@@ -98,6 +98,20 @@
         "mail" : "abe",
         "time" : "8:0:0"
     },
+    "bowtie_build_spades_comb" :
+    {
+        "n" : "16",
+        "mem" : "4",
+        "mail" : "e",
+        "time" : "8:0:0"
+    },
+    "bowtie_map_spades_comb" :
+    {
+        "n" : "16",
+        "mem" : "4",
+        "mail" : "e",
+        "time" : "8:0:0"
+    },
     "plass_mg" :
     {
         "n" : "24",

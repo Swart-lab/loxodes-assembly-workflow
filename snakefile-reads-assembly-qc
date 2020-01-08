@@ -58,6 +58,43 @@ rule bbmap_covstats:
         "bbmap.sh -Xmx60g threads={threads} fast=t nodisk minid=0.98 ref={input.scaffolds} in={input.cor_fwd} in2={input.cor_rev} covstats={output} &> {log};"
         "sed -i 's/^#//' {output};" # Strip leading # from header line
 
+rule bowtie_build_spades_comb:
+    # Build bowtie database of combined assembly, required for mapping
+    input:
+        scaffolds="assembly/spades-comb_{sp}_q{qtrimvals}/scaffolds.fasta"
+    output:
+        "annotation/spades-comb_{sp}_q{qtrimvals}/mapping/spades-comb_{sp}_q{qtrimvals}.1.bt2"
+    conda: "envs/bowtie2.yml"
+    threads: 16
+    log: "logs/bowtie_build_spades_comb.{sp}_q{qtrimvals}.log"
+    params:
+        prefix="annotation/spades-comb_{sp}_q{qtrimvals}/mapping/spades-comb_{sp}_q{qtrimvals}",
+        seed=12345
+    shell:
+        "touch annotation/spades-comb_{wildcards.sp}_q{wildcards.qtrimvals}/mapping/DO_NOT_BACKUP_THIS_FOLDER;"
+        "bowtie2-build --threads {threads} --seed {params.seed} {input.scaffolds} {params.prefix} &> {log}"
+
+rule bowtie_map_spades_comb:
+    # Map combined assembly with bowtie2
+    input:
+        scaffolds="assembly/spades-comb_{sp}_q{qtrimvals}/scaffolds.fasta",
+        bt2_index1="annotation/spades-comb_{sp}_q{qtrimvals}/mapping/spades-comb_{sp}_q{qtrimvals}.1.bt2",
+        cor_fwd=get_spades_multiple_input_corr_reads_fwd,
+        cor_rev=get_spades_multiple_input_corr_reads_rev
+    output:
+        bam="annotation/spades-comb_{sp}_q{qtrimvals}/mapping/spades-comb_{sp}_q{qtrimvals}.bam",
+        bamsort="annotation/spades-comb_{sp}_q{qtrimvals}/mapping/spades-comb_{sp}_q{qtrimvals}.sort.bam"
+    log: "logs/bowtie_map_spades_comb.{sp}_q{qtrimvals}.log"
+    threads: 16
+    conda: "envs/bowtie2.yml"
+    params:
+        prefix="annotation/spades-comb_{sp}_q{qtrimvals}/mapping/spades-comb_{sp}_q{qtrimvals}",
+        inarg=lambda wildcards: ','.join(get_spades_multiple_input_corr_reads_fwd(wildcards)),
+        in2arg=lambda wildcards: ','.join(get_spades_multiple_input_corr_reads_rev(wildcards))
+    shell:
+        "bowtie2 --very-fast --no-unal --threads {threads} -x {params.prefix} -1 {params.inarg} -2 {params.in2arg} | samtools view -bS > {output.bam};"
+        "samtools sort --threads 16 -o {output.bamsort} --reference {input.scaffolds} {output.bam};"
+
 rule barrnap:
     # Screen assembly for rRNA genes
     input:
