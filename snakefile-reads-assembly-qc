@@ -95,6 +95,42 @@ rule bowtie_map_spades_comb:
         "bowtie2 --very-fast --no-unal --threads {threads} -x {params.prefix} -1 {params.inarg} -2 {params.in2arg} | samtools view -bS > {output.bam};"
         "samtools sort --threads 16 -o {output.bamsort} --reference {input.scaffolds} {output.bam};"
 
+rule bowtie_map_spades_comb_samtools_depth:
+    # Get coverage from sorted BAM file of bowtie2 mapping reads to combined metagenomic assemblies
+    input:
+        scaffolds="assembly/spades-comb_{sp}_q{qtrimvals}/scaffolds.fasta",
+        bamsort="annotation/spades-comb_{sp}_q{qtrimvals}/mapping/spades-comb_{sp}_q{qtrimvals}.sort.bam"
+    output:
+        "annotation/spades-comb_{sp}_q{qtrimvals}/mapping/spades-comb_{sp}_q{qtrimvals}.bt2.depth"
+    log: "logs/bowtie_map_spades_comb_samtools_depth.{sp}_q{qtrimvals}.log"
+    threads: 2
+    conda: "envs/bowtie2.yml"
+    shell:
+        "samtools depth -a --reference {input.scaffolds} -o {output} {input.bamsort} &> {log}"
+
+rule bowtie_map_spades_comb_covstats:
+    # Convert samtools depth file to covstats-like file
+    input:
+        depth="annotation/spades-comb_{sp}_q{qtrimvals}/mapping/spades-comb_{sp}_q{qtrimvals}.bt2.depth",
+        scaffolds="assembly/spades-comb_{sp}_q{qtrimvals}/scaffolds.fasta"
+    output:
+        "annotation/spades-comb_{sp}_q{qtrimvals}/spades-comb_{sp}_q{qtrimvals}.bt2.covstats"
+    log: "logs/bowtie_map_spades_comb_covstats.{sp}_q{qtrimvals}.log"
+    threads: 2
+    shell:
+        "python3 code/samtools_depth_to_covstats.py --depth {input.depth} --fasta {input.scaffolds} --out {output} --log {log}"
+
+rule plot_bt2_covstats_cdsdens:
+    # Blob plot of metagenome assembly using covstats from Bowtie2, colored by CDS density
+    input:
+        covstats="annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.bt2.covstats",
+        cdsdens="annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.cds-dens.tsv"
+    output:
+        "annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.bt2.blobplot.png"
+    threads: 2
+    shell: 
+        "Rscript code/blobplot.R --covstats {input.covstats} --cdsdens {input.cdsdens} --out {output}"
+
 rule barrnap:
     # Screen assembly for rRNA genes
     input:

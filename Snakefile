@@ -6,7 +6,8 @@ include: "snakefile-reads-rnaseq-preprocess-qc"
 rule annotation_spades_comb:
     # Annotate each combined metagenomic assembly
     input:
-        expand("annotation/spades-comb_{sp}_q{qtrimvals}/mapping/spades-comb_{sp}_q{qtrimvals}.sort.bam",
+        # expand("annotation/spades-comb_{sp}_q{qtrimvals}/mapping/spades-comb_{sp}_q{qtrimvals}.sort.bam",
+        expand("annotation/spades-comb_{sp}_q{qtrimvals}/spades-comb_{sp}_q{qtrimvals}.bt2.blobplot.png",
                sp=config['species'],
                qtrimvals=[28]),
         # expand("annotation/spades-comb_{sp}_q{qtrimvals}/spades-comb_{sp}_q{qtrimvals}.scaffolds.covstats",
