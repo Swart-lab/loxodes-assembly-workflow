@@ -1,4 +1,4 @@
-include: "snakefile-reads-assembly"
+include: "snakefile-reads-assembly-spades"
 include: "snakefile-reads-assembly-qc"
 include: "snakefile-reads-preprocess-qc"
 include: "snakefile-reads-rnaseq-preprocess-qc"
