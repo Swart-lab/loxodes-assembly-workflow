@@ -188,6 +188,8 @@ rule bowtie_map_indiv_covstats:
         "annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.bt2.covstats"
     log: "logs/bowtie_map_indiv_covstats.{assembler}.{lib}_q{qtrimvals}.log"
     threads: 2
+    wildcard_constraints:
+        assembler="[^_]+(?<!comb)" # Negate underscore character so that the assembler and lib wildcards are split properly, negative lookbehind for 'comb' to avoid applying this rule to combined assemblies
     shell:
         "python3 code/samtools_depth_to_covstats.py --depth {input.depth} --fasta {input.scaffolds} --out {output} --log {log}"
 
