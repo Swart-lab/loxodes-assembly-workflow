@@ -1,4 +1,5 @@
 include: "snakefile-reads-assembly-spades"
+include: "snakefile-reads-assembly-megahit"
 include: "snakefile-reads-assembly-qc"
 include: "snakefile-reads-preprocess-qc"
 include: "snakefile-reads-rnaseq-preprocess-qc"
@@ -60,17 +61,18 @@ rule annotation_spades_sc:
 rule assembly:
     input:
         # Individual assemblies of each bulk metagenomic library
-        expand("assembly/spades_{lib_mg}_q{qtrimvals}/scaffolds.fasta",
-               lib_mg=config['libraries_mg'],
-               qtrimvals=config['qtrimvals']),
+        # expand("assembly/spades_{lib_mg}_q{qtrimvals}/scaffolds.fasta",
+        #        lib_mg=config['libraries_mg'],
+        #        qtrimvals=config['qtrimvals']),
         # Individual assemblies of each single-cell MDA library
         expand("assembly/spades-sc_{lib_sc}_q{qtrimvals}/scaffolds.fasta",
                lib_sc=config["libraries_sc"],
                qtrimvals=config["qtrimvals"]),
         # Combined assemblies of all bulk metagenomic libraries per species
-        expand("assembly/spades-comb_{sp}_q{qtrimvals}/scaffolds.fasta",
+        expand("assembly/{assembler}-comb_{sp}_q{qtrimvals}/scaffolds.fasta",
+               assembler=['spades','megahit'],
                sp=config['species'],
-               qtrimvals=config['qtrimvals'])
+               qtrimvals=[28])
 
 rule qc:
     input:
