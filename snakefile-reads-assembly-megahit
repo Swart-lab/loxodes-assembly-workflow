@@ -1,0 +1,30 @@
+# Rules for assembly of genomic DNAseq reads
+
+# Combined list of input files for SPAdes combined assembly (metagenome)
+def combine_megahit_input_files(wildcards):
+    r12=expand("data/reads-trim/{lib}_R12_ktrim_qtrim{qtrimvals}.fq.gz",
+               lib=config['_'.join(['libraries',wildcards.sp])]['illumina-bulk'],
+               qtrimvals=wildcards.qtrimvals)
+    r12.sort()
+    return ','.join(r12)
+
+rule megahit_k141_comb:
+    # Combined assembly for each species, using all metagenomic libraries available for that species
+    input:
+        lambda wildcards: expand("data/reads-trim/{lib}_R12_ktrim_qtrim{qtrimvals}.fq.gz",lib=config['_'.join(['libraries',wildcards.sp])]['illumina-bulk'],qtrimvals=wildcards.qtrimvals)
+    output:
+        scaffolds="assembly/megahit-comb_{sp}_q{qtrimvals}/scaffolds.fasta", # This will be a symlink
+        fastg="assembly/megahit-comb_{sp}_q{qtrimvals}/assembly_graph.fastg"
+    threads: 32
+    conda: "envs/megahit.yml"
+    log: "logs/megahit_k141_comb.{sp}_q{qtrimvals}.log"
+    params:
+        pe_inargs=combine_megahit_input_files,
+        mem=200000000000,
+        outdir="assembly/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}",
+        outprefix="megahit-comb_{sp}_q{qtrimvals}",
+        klist="21,29,39,59,79,99,119,141"
+    shell:
+        "megahit --12 {params.pe_inargs} --memory {params.mem} --num-cpu-threads {threads} --k-list {params.klist} --out-dir {params.outdir} --out-prefix {params.outprefix};"
+        "ln -s {params.outdir}/{params.outprefix}.contigs.fa {output.scaffolds};" # Symlink to emulate Spades output filename convention
+        "megahit_toolkit contig2fastg 141 {params.outdir}/intermediate_contigs/k141.contigs.fa > {output.fastg};" # Generate Fastg output
