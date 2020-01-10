@@ -72,6 +72,10 @@ rule assembly:
         expand("assembly/{assembler}-comb_{sp}_q{qtrimvals}/scaffolds.fasta",
                assembler=['spades','megahit'],
                sp=config['species'],
+               qtrimvals=[28]),
+        expand("assembly/{assembler}-comb_{sp}_q{qtrimvals}/assembly_graph.fastg",
+               assembler=['spades','megahit'],
+               sp=config['species'],
                qtrimvals=[28])
 
 rule qc:

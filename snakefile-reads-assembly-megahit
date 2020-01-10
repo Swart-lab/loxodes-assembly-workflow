@@ -13,8 +13,8 @@ rule megahit_k141_comb:
     input:
         lambda wildcards: expand("data/reads-trim/{lib}_R12_ktrim_qtrim{qtrimvals}.fq.gz",lib=config['_'.join(['libraries',wildcards.sp])]['illumina-bulk'],qtrimvals=wildcards.qtrimvals)
     output:
-        scaffolds="assembly/megahit-comb_{sp}_q{qtrimvals}/scaffolds.fasta", # This will be a symlink
-        fastg="assembly/megahit-comb_{sp}_q{qtrimvals}/assembly_graph.fastg"
+        contigs="assembly/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}.contigs.fa",
+        k141="assembly/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}/intermediate_contigs/k141.contigs.fa"
     threads: 32
     conda: "envs/megahit.yml"
     log: "logs/megahit_k141_comb.{sp}_q{qtrimvals}.log"
@@ -25,6 +25,18 @@ rule megahit_k141_comb:
         outprefix="megahit-comb_{sp}_q{qtrimvals}",
         klist="21,29,39,59,79,99,119,141"
     shell:
-        "megahit --12 {params.pe_inargs} --memory {params.mem} --num-cpu-threads {threads} --k-list {params.klist} --out-dir {params.outdir} --out-prefix {params.outprefix};"
-        "ln -s {params.outdir}/{params.outprefix}.contigs.fa {output.scaffolds};" # Symlink to emulate Spades output filename convention
-        "megahit_toolkit contig2fastg 141 {params.outdir}/intermediate_contigs/k141.contigs.fa > {output.fastg};" # Generate Fastg output
+        "megahit --12 {params.pe_inargs} --memory {params.mem} --num-cpu-threads {threads} --k-list {params.klist} --out-dir {params.outdir} --out-prefix {params.outprefix} 2> {log};"
+
+rule megahit_k141_comb_tidy:
+    # Tidy up otuput of megahit by creating symlinks and fastg file
+    input:
+        contigs="assembly/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}.contigs.fa",
+        k141="assembly/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}/intermediate_contigs/k141.contigs.fa"
+    output:
+        scaffolds="assembly/megahit-comb_{sp}_q{qtrimvals}/scaffolds.fasta", # This will be a symlink
+        fastg="assembly/megahit-comb_{sp}_q{qtrimvals}/assembly_graph.fastg"
+    threads: 2
+    conda: "envs/megahit.yml"
+    shell:
+        "ln -sr {input.contigs} {output.scaffolds};" # create symbolic, relative link, the -r option is necessary otherwise will break
+        "megahit_toolkit contig2fastg 141 {input.k141} > {output.fastg};" # Create Fastg file from contigs of highest kmer used
