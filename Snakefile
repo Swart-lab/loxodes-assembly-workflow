@@ -2,8 +2,26 @@ include: "snakefile-reads-assembly-spades"
 include: "snakefile-reads-assembly-megahit"
 include: "snakefile-reads-assembly-spades-qc"
 include: "snakefile-reads-assembly-megahit-qc"
+include: "snakefile-reads-assembly-qc"
 include: "snakefile-reads-preprocess-qc"
 include: "snakefile-reads-rnaseq-preprocess-qc"
+
+rule annotation_megahit_comb:
+    input:
+        expand("annotation/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}.bt2.blobplot.png",
+               sp=config['species'],
+               qtrimvals=[28]),
+        # expand("annotation/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}.cds-dens.tsv",
+        #        sp=config['species'],
+        #        qtrimvals=[28])
+        expand("annotation/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}.barrnap.{kingdom}.Bandage.png",
+               sp=config['species'],
+               qtrimvals=[28],
+               kingdom=config['barrnap_kingdoms']),
+        expand("annotation/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}.{rrnagene}.nhmmer.out",
+               sp=config['species'],
+               rrnagene=config['ciliate_mt_rRNA'],
+               qtrimvals=[28])
 
 rule annotation_spades_comb:
     # Annotate each combined metagenomic assembly

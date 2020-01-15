@@ -19,7 +19,7 @@ rule combine_reads:
         "gzip -cd {input.fwd} | pigz -p {params.pigzthreads} -c > {output.fwd};"
         "gzip -cd {input.rev} | pigz -p {params.pigzthreads} -c > {output.rev};"
 
-rule bbduk_qtrim_ktrim:
+rule bbduk_qtrim_ktrim_interleaved:
     # Kmer trim adapters and quality trim reads 
     input:
         fwd="data/reads-combine/{lib}_R1.fq.gz",
@@ -27,10 +27,24 @@ rule bbduk_qtrim_ktrim:
     output:
         "data/reads-trim/{lib}_R12_ktrim_qtrim{qtrimvals}.fq.gz"
     threads: 8
-    log: "logs/bbduk_qtrim_ktrim.{lib}_q{qtrimvals}.log"
+    log: "logs/bbduk_qtrim_ktrim_interleaved.{lib}_q{qtrimvals}.log"
     conda: "envs/bbmap.yml"
     shell:
         "bbduk.sh -Xmx10g ref=resources/adapters.fa,resources/phix174_ill.ref.fa.gz threads={threads} in={input.fwd} in2={input.rev} ktrim=r qtrim=rl trimq={wildcards.qtrimvals} minlength=25 out={output} 2> {log}"
+
+rule bbduk_qtrim_ktrim_split:
+    # Kmer trim adapters and quality trim reads 
+    input:
+        fwd="data/reads-combine/{lib}_R1.fq.gz",
+        rev="data/reads-combine/{lib}_R2.fq.gz"
+    output:
+        fwd="data/reads-trim/{lib}_R1_ktrim_qtrim{qtrimvals}.fq.gz",
+        rev="data/reads-trim/{lib}_R2_ktrim_qtrim{qtrimvals}.fq.gz"
+    threads: 8
+    log: "logs/bbduk_qtrim_ktrim_split.{lib}_q{qtrimvals}.log"
+    conda: "envs/bbmap.yml"
+    shell:
+        "bbduk.sh -Xmx10g ref=resources/adapters.fa,resources/phix174_ill.ref.fa.gz threads={threads} in={input.fwd} in2={input.rev} ktrim=r qtrim=rl trimq={wildcards.qtrimvals} minlength=25 out={output.fwd} out2={output.rev} 2> {log}"
 
 rule phyloflash:
     # QC for taxonomic composition of read library, expect to have contaminants especially bacteria and food algae

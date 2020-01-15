@@ -1,0 +1,65 @@
+# Rules for QC and initial annotation of genomic DNAseq reads
+
+import glob # Needed for functions below
+
+rule bowtie_build_megahit_comb:
+    # Build bowtie database of combined assembly, required for mapping
+    input:
+        scaffolds="assembly/megahit-comb_{sp}_q{qtrimvals}/scaffolds.fasta"
+    output:
+        "annotation/megahit-comb_{sp}_q{qtrimvals}/mapping/megahit-comb_{sp}_q{qtrimvals}.1.bt2"
+    conda: "envs/bowtie2.yml"
+    threads: 16
+    log: "logs/bowtie_build_megahit_comb.{sp}_q{qtrimvals}.log"
+    params:
+        prefix="annotation/megahit-comb_{sp}_q{qtrimvals}/mapping/megahit-comb_{sp}_q{qtrimvals}",
+        seed=12345
+    shell:
+        "touch annotation/megahit-comb_{wildcards.sp}_q{wildcards.qtrimvals}/mapping/DO_NOT_BACKUP_THIS_FOLDER;"
+        "bowtie2-build --threads {threads} --seed {params.seed} {input.scaffolds} {params.prefix} &> {log}"
+
+rule bowtie_map_megahit_comb:
+    # Map combined assembly with bowtie2
+    input:
+        pe_reads_fwd=lambda wildcards: expand("data/reads-trim/{lib}_R1_ktrim_qtrim{qtrimvals}.fq.gz",lib=config['_'.join(['libraries',wildcards.sp])]['illumina-bulk'],qtrimvals=wildcards.qtrimvals),
+        pe_reads_rev=lambda wildcards: expand("data/reads-trim/{lib}_R2_ktrim_qtrim{qtrimvals}.fq.gz",lib=config['_'.join(['libraries',wildcards.sp])]['illumina-bulk'],qtrimvals=wildcards.qtrimvals),
+        scaffolds="assembly/megahit-comb_{sp}_q{qtrimvals}/scaffolds.fasta",
+        bt2_index1="annotation/megahit-comb_{sp}_q{qtrimvals}/mapping/megahit-comb_{sp}_q{qtrimvals}.1.bt2",
+    output:
+        bam="annotation/megahit-comb_{sp}_q{qtrimvals}/mapping/megahit-comb_{sp}_q{qtrimvals}.bam",
+        bamsort="annotation/megahit-comb_{sp}_q{qtrimvals}/mapping/megahit-comb_{sp}_q{qtrimvals}.sort.bam"
+    log: "logs/bowtie_map_megahit_comb.{sp}_q{qtrimvals}.log"
+    threads: 16
+    conda: "envs/bowtie2.yml"
+    params:
+        prefix="annotation/megahit-comb_{sp}_q{qtrimvals}/mapping/megahit-comb_{sp}_q{qtrimvals}",
+        inarg_fwd=combine_megahit_input_files_fwd,
+        inarg_rev=combine_megahit_input_files_rev
+    shell:
+        "bowtie2 --very-fast --no-unal --threads {threads} -x {params.prefix} -1 {params.inarg_fwd} -2 {params.inarg_rev} | samtools view -bS > {output.bam};"
+        "samtools sort --threads 16 -o {output.bamsort} --reference {input.scaffolds} {output.bam};"
+
+rule bowtie_map_megahit_comb_samtools_depth:
+    # Get coverage from sorted BAM file of bowtie2 mapping reads to combined metagenomic assemblies
+    input:
+        scaffolds="assembly/megahit-comb_{sp}_q{qtrimvals}/scaffolds.fasta",
+        bamsort="annotation/megahit-comb_{sp}_q{qtrimvals}/mapping/megahit-comb_{sp}_q{qtrimvals}.sort.bam"
+    output:
+        "annotation/megahit-comb_{sp}_q{qtrimvals}/mapping/megahit-comb_{sp}_q{qtrimvals}.bt2.depth"
+    log: "logs/bowtie_map_megahit_comb_samtools_depth.{sp}_q{qtrimvals}.log"
+    threads: 2
+    conda: "envs/bowtie2.yml"
+    shell:
+        "samtools depth -a --reference {input.scaffolds} -o {output} {input.bamsort} &> {log}"
+
+rule bowtie_map_megahit_comb_covstats:
+    # Convert samtools depth file to covstats-like file
+    input:
+        depth="annotation/megahit-comb_{sp}_q{qtrimvals}/mapping/megahit-comb_{sp}_q{qtrimvals}.bt2.depth",
+        scaffolds="assembly/megahit-comb_{sp}_q{qtrimvals}/scaffolds.fasta"
+    output:
+        "annotation/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}.bt2.covstats"
+    log: "logs/bowtie_map_megahit_comb_covstats.{sp}_q{qtrimvals}.log"
+    threads: 2
+    shell:
+        "python3 code/samtools_depth_to_covstats.py --depth {input.depth} --fasta {input.scaffolds} --out {output} --log {log}"

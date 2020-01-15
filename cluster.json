@@ -136,6 +136,32 @@
         "mem" : "16",
         "time" : "2:0:0"
     },
+    "bowtie_build_megahit_comb" :
+    {
+        "n" : "16",
+        "mem" : "4",
+        "mail" : "e",
+        "time" : "8:0:0"
+    },
+    "bowtie_map_megahit_comb" :
+    {
+        "n" : "16",
+        "mem" : "4",
+        "mail" : "e",
+        "time" : "8:0:0"
+    },
+    "bowtie_map_megahit_comb_samtools_depth" :
+    {
+        "n" : "2",
+        "mem" : "16",
+        "time" : "4:0:0"
+    },
+    "bowtie_map_megahit_comb_covstats" :
+    {
+        "n" : "2",
+        "mem" : "16",
+        "time" : "2:0:0"
+    },
     "plass_mg" :
     {
         "n" : "24",

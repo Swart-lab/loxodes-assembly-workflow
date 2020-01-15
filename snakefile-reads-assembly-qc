@@ -1,0 +1,88 @@
+rule bowtie_map_indiv_covstats:
+    # Convert samtools depth file to covstats-like file
+    input:
+        depth="annotation/{assembler}_{lib}_q{qtrimvals}/mapping/{assembler}_{lib}_q{qtrimvals}.bt2.depth",
+        scaffolds="assembly/{assembler}_{lib}_q{qtrimvals}/scaffolds.fasta"
+    output:
+        "annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.bt2.covstats"
+    log: "logs/bowtie_map_indiv_covstats.{assembler}.{lib}_q{qtrimvals}.log"
+    threads: 2
+    wildcard_constraints:
+        assembler="[^_]+(?<!comb)" # Negate underscore character so that the assembler and lib wildcards are split properly, negative lookbehind for 'comb' to avoid applying this rule to combined assemblies
+    shell:
+        "python3 code/samtools_depth_to_covstats.py --depth {input.depth} --fasta {input.scaffolds} --out {output} --log {log}"
+
+rule plot_bt2_covstats_cdsdens:
+    # Blob plot of metagenome assembly using covstats from Bowtie2, colored by CDS density
+    input:
+        covstats="annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.bt2.covstats",
+        cdsdens="annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.cds-dens.tsv"
+    output:
+        "annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.bt2.blobplot.png"
+    threads: 2
+    shell: 
+        "Rscript code/blobplot.R --covstats {input.covstats} --cdsdens {input.cdsdens} --out {output}"
+
+rule barrnap:
+    # Screen assembly for rRNA genes
+    input:
+        "assembly/{assembler}_{lib}_q{qtrimvals}/scaffolds.fasta"
+    output:
+        gff="annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.barrnap.{kingdom}.gff",
+        fasta="annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.barrnap.{kingdom}.fasta"
+    conda: "envs/barrnap.yml"
+    threads: 4
+    log: "logs/barrnap.{assembler}_{lib}_q{qtrimvals}.{kingdom}.log"
+    shell:
+        "barrnap --kingdom {wildcards.kingdom} --threads {threads} {input} > {output.gff} 2> {log};"
+        "bedtools getfasta -fi {input} -bed {output.gff} -fo {output.fasta} 2>> {log}"
+
+rule bandage_rrna_draw:
+    # From assembly graph draw contigs connected to identified rRNA sequences
+    # to see if bacterial genomes/contigs can be pulled out
+    input:
+        fastg="assembly/{assembler}_{lib}_q{qtrimvals}/assembly_graph.fastg",
+        barrnap_fasta="annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.barrnap.{kingdom}.fasta"
+    output:
+        "annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.barrnap.{kingdom}.Bandage.png"
+    conda: "envs/bandage.yml"
+    threads: 1
+    log: "logs/bandage_rrna_draw.{assembler}_{lib}_q{qtrimvals}.{kingdom}.log"
+    shell:
+        "Bandage image {input.fastg} {output} --query {input.barrnap_fasta} --scope aroundblast --distance 5 &> {log}"
+
+rule mt_rrna_hmm:
+    # Scan for ciliate mt rRNA sequences using custom HMM
+    input:
+        "assembly/{assembler}_{lib}_q{qtrimvals}/scaffolds.fasta"
+    output:
+        out="annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.{rrnagene}.nhmmer.out",
+        tblout="annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.{rrnagene}.nhmmer.tblout"
+    conda: "envs/barrnap.yml"
+    log: "logs/mt_rrna_hmm.{assembler}_{lib}_q{qtrimvals}.{rrnagene}.log"
+    params:
+        hmm="resources/mt_rRNA_hmm/ciliate_{rrnagene}.hmm"
+    threads: 4
+    shell:
+        "nhmmer --cpu {threads} --tblout {output.tblout} {params.hmm} {input} > {output.out} 2> {log}"
+
+rule prodigal_for_cds_dens:
+    input:
+        "assembly/{assembler}_{lib}_q{qtrimvals}/scaffolds.fasta"
+    output:
+        "annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.prodigal.gff"
+    conda: "envs/prodigal.yml"
+    threads: 16
+    shell:
+        "cat {input} | parallel --gnu -j {threads} --recstart '>' -N 100 --pipe prodigal -f gff -p meta -g 11 > {output}"
+
+rule calculate_cds_dens:
+    input:
+        assembly="assembly/{assembler}_{lib}_q{qtrimvals}/scaffolds.fasta",
+        gff="annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.prodigal.gff"
+    output:
+        "annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.cds-dens.tsv"
+    params:
+        prefix="annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}"
+    shell:
+        "perl code/bin_by_coding_density.pl --in {input.assembly} --gff {input.gff} --out {params.prefix} --no-fasta"

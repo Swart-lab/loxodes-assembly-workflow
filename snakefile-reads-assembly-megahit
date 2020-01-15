@@ -8,6 +8,22 @@ def combine_megahit_input_files(wildcards):
     r12.sort()
     return ','.join(r12)
 
+# Combined list of input files for SPAdes combined assembly (metagenome)
+def combine_megahit_input_files_fwd(wildcards):
+    r1=expand("data/reads-trim/{lib}_R1_ktrim_qtrim{qtrimvals}.fq.gz",
+               lib=config['_'.join(['libraries',wildcards.sp])]['illumina-bulk'],
+               qtrimvals=wildcards.qtrimvals)
+    r1.sort()
+    return ','.join(r1)
+
+# Combined list of input files for SPAdes combined assembly (metagenome)
+def combine_megahit_input_files_rev(wildcards):
+    r2=expand("data/reads-trim/{lib}_R2_ktrim_qtrim{qtrimvals}.fq.gz",
+               lib=config['_'.join(['libraries',wildcards.sp])]['illumina-bulk'],
+               qtrimvals=wildcards.qtrimvals)
+    r2.sort()
+    return ','.join(r2)
+
 rule megahit_k141_comb:
     # Combined assembly for each species, using all metagenomic libraries available for that species
     input:
