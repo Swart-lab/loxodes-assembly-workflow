@@ -1,0 +1,17 @@
+# Rules for assembly of RNAseq 
+rule trinity_rnaseq_nochlamy:
+    input:
+        lambda wildcards: expand("data/reads-rnaseq-filter/{lib}_R12_ktrim_qtrim{qtrimvals}_bbmap_nochlamy.R12.fq.gz",lib=config["libraries_rnaseq"],qtrimvals=wildcards.qtrimvals)
+    threads: 8
+    params:
+        sslibtype="RF",
+        hpcgridrunnerpath="opt/HpcGridRunner-1.0.2/hpc_cmds_GridRunner.pl",
+        hpcgridrunnerconfig="workflow/hpcgridrunner_sge_conf_trinity",
+        samplesfile="trinity_samples_nochlamy.txt",
+        prefix="assembly/trinity_rnaseq_nochlamy_comb/trinity_outdir"
+    output:
+        assembly="assembly/trinity_rnaseq_nochlamy_comb/trinity_outdir/Trinity.fasta"
+    shell:
+        "Trinity --seqType fq --max_memory 64G --CPU {threads} --SS_lib_type {params.sslibtype} --grid_exec=\"{params.hpcgridrunnerpath} -G {params.hpcgridrunnerconfig} -c\" --samples_file {params.samplesfile} --output {params.prefix}"
+
+
