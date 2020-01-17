@@ -91,6 +91,38 @@ libraries_rnaseq:
   - 4305_E
   - 4305_F
 
+# RNAseq libraries and sample files for Trinity organized by experiment
+experiments_rnaseq:
+  exp146:
+    libraries:
+      - 4305_A
+      - 4305_B
+      - 4305_C
+      - 4305_D
+      - 4305_E
+      - 4305_F
+    sample_file:
+      workflow/trinity_samples_rnaseq_exp146.txt
+    species:
+      Lmag
+    strain:
+      Lm5
+
+# Small-RNAseq libraries and sample files for Trinity, organized by experiment
+experiments_srnaseq:
+  exp146:
+    libraries:
+      - 4306_A
+      - 4306_B
+      - 4306_C
+      - 4306_D
+      - 4306_E
+      - 4306_F
+    species:
+      Lmag
+    strain:
+      Lm5
+
 # List of all DNAseq raw reads organized by library
 reads_raw:
   4090_A:

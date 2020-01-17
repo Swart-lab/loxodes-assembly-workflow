@@ -67,7 +67,7 @@
         "mem" : "8",
         "time" : "16:0:0"
     },
-    "trinity_rnaseq_nochlamy" :
+    "trinity_rnaseq_nochlamy_comb" :
     {
         "n" : "16",
         "mem" : "8",

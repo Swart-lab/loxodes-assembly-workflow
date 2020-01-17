@@ -5,6 +5,7 @@ include: "snakefile-reads-assembly-megahit-qc"
 include: "snakefile-reads-assembly-qc"
 include: "snakefile-reads-preprocess-qc"
 include: "snakefile-reads-rnaseq-preprocess-qc"
+include: "snakefile-reads-rnaseq-assembly"
 
 rule annotation_megahit_comb:
     input:
@@ -77,6 +78,11 @@ rule annotation_spades_sc:
                rrnagene=config['ciliate_mt_rRNA'],
                qtrimvals=config['qtrimvals'])
 
+rule assembly_rnaseq:
+    input:
+        # Combined assemblies of RNAseq libraries, combined by experiment
+        expand("assembly/trinity_rnaseq_{experiment}_nochlamy_comb/trinity_outdir/Trinity.fasta",
+               experiment=["exp146"])
 rule assembly:
     input:
         # Individual assemblies of each bulk metagenomic library
