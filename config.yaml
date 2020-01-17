@@ -1,3 +1,4 @@
+# List of all DNAseq libraries
 libraries:
   #- 3556_A
   #- 3556_B
@@ -15,23 +16,28 @@ libraries:
   - 4091_E
   - 4091_F
 
+# List shortnames for all species
 species:
   - Lstr
   - Lmag
 
+# Allowed values for 'kingdom' parameter in bbmap
 barrnap_kingdoms:
   - mito
   - euk
   - bac
 
+# Names of mtrRNA genes for model
 ciliate_mt_rRNA:
   - mtSSU
   - mtLSU
 
+# Quality trim values for read trimming with bbduk
 qtrimvals:
   - 2
   - 28
 
+# DNAseq libraries for species Lstr
 libraries_Lstr:
   illumina-bulk:
     - 4090_A
@@ -41,6 +47,7 @@ libraries_Lstr:
     - 4091_C
     - 4091_D
 
+# DNAseq libraries for species Lmag
 libraries_Lmag:
   illumina-bulk:
     - 4090_D
@@ -49,6 +56,7 @@ libraries_Lmag:
     - 4091_E
     - 4091_F
 
+# List of all Loxodes bulk metagenome DNAseq libraries
 libraries_lox:
   - 4090_A
   - 4090_B
@@ -56,6 +64,7 @@ libraries_lox:
   - 4090_D
   - 4090_E
 
+# List of all bulk metagenome DNAseq libraries
 libraries_mg:
   - 4090_A
   - 4090_B
@@ -64,6 +73,7 @@ libraries_mg:
   - 4090_E
   - 4090_F
 
+# List of all single-cell DNAseq libraries
 libraries_sc:
   - 4091_A
   - 4091_B
@@ -72,6 +82,7 @@ libraries_sc:
   - 4091_E
   - 4091_F
 
+# List of all RNAseq libraries
 libraries_rnaseq:
   - 4305_A
   - 4305_B
@@ -80,6 +91,7 @@ libraries_rnaseq:
   - 4305_E
   - 4305_F
 
+# List of all DNAseq raw reads organized by library
 reads_raw:
   4090_A:
     fwd:
@@ -164,6 +176,7 @@ reads_raw:
       - data/reads/4091_F_run579_GTAGAGGA_S432_L005_R2_001.fastq.gz
       - data/reads/4091_F_run583_GTAGAGGA_S285_L005_R2_001.fastq.gz
 
+#  List of all raw RNAseq reads, organized by sequence library
 reads_rnaseq_raw:
   4305_A:
     fwd:
