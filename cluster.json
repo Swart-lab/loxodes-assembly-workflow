@@ -9,7 +9,7 @@
     },
     "combine_reads" :
     {
-        "n" : "16",
+        "n" : "8",
         "mem" : "1",
         "time" : "2:0:0"
     },
@@ -83,7 +83,7 @@
     "phyloflash" :
     {
         "n" : "8",
-        "mem" : "1",
+        "mem" : "5",
         "time" : "0:30:0"
     },
      "phyloflash_rnaseq" :
