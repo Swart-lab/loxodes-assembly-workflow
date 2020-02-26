@@ -84,13 +84,13 @@
     {
         "n" : "8",
         "mem" : "5",
-        "time" : "0:30:0"
+        "time" : "1:00:0"
     },
      "phyloflash_rnaseq" :
     {
         "n" : "8",
         "mem" : "5",
-        "time" : "0:30:0"
+        "time" : "1:00:0"
     },
     "split_filter_rnaseq_chlamy_reads" :
     {
