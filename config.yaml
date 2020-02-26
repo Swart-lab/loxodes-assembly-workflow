@@ -15,11 +15,23 @@ libraries:
   - 4091_D
   - 4091_E
   - 4091_F
+  - 4519_A
+  - 4519_B
+  - 4519_C
+  - 4519_D
+  - 4519_E
+  - 4519_F
+  - 4519_G
+  - 4519_H
 
 # List shortnames for all species
 species:
   - Lstr
   - Lmag
+  - LstrMAC
+  - LstrMIC
+  - LmagMAC
+  - LmagMIC
 
 # Allowed values for 'kingdom' parameter in bbmap
 barrnap_kingdoms:
@@ -207,6 +219,46 @@ reads_raw:
     rev:
       - data/reads/4091_F_run579_GTAGAGGA_S432_L005_R2_001.fastq.gz
       - data/reads/4091_F_run583_GTAGAGGA_S285_L005_R2_001.fastq.gz
+  4519_A:
+    fwd:
+      - data/reads/4519_A_run645_GTCTTACA_S65_L002_R1_001.fastq.gz
+    rev:
+      - data/reads/4519_A_run645_GTCTTACA_S65_L002_R2_001.fastq.gz
+  4519_B:
+    fwd:
+      - data/reads/4519_B_run645_GCCGCATG_S66_L002_R1_001.fastq.gz
+    rev:
+      - data/reads/4519_B_run645_GCCGCATG_S66_L002_R2_001.fastq.gz
+  4519_C:
+    fwd:
+      - data/reads/4519_C_run645_CTGCACAT_S67_L002_R1_001.fastq.gz
+    rev:
+      - data/reads/4519_C_run645_CTGCACAT_S67_L002_R2_001.fastq.gz
+  4519_D:
+    fwd:
+      - data/reads/4519_D_run645_CGTGTCTA_S68_L002_R1_001.fastq.gz
+    rev:
+      - data/reads/4519_D_run645_CGTGTCTA_S68_L002_R2_001.fastq.gz
+  4519_E:
+    fwd:
+      - data/reads/4519_E_run645_CCGACGTT_S69_L002_R1_001.fastq.gz
+    rev:
+      - data/reads/4519_E_run645_CCGACGTT_S69_L002_R2_001.fastq.gz
+  4519_F:
+    fwd:
+      - data/reads/4519_F_run645_CAATGAGC_S70_L002_R1_001.fastq.gz
+    rev:
+      - data/reads/4519_F_run645_CAATGAGC_S70_L002_R2_001.fastq.gz
+  4519_G:
+    fwd:
+      - data/reads/4519_G_run645_ATACGGAG_S71_L002_R1_001.fastq.gz
+    rev:
+      - data/reads/4519_G_run645_ATACGGAG_S71_L002_R2_001.fastq.gz
+  4519_H:
+    fwd:
+      - data/reads/4519_H_run645_AGATGCTA_S72_L002_R1_001.fastq.gz
+    rev:
+      - data/reads/4519_H_run645_AGATGCTA_S72_L002_R2_001.fastq.gz
 
 #  List of all raw RNAseq reads, organized by sequence library
 reads_rnaseq_raw:
