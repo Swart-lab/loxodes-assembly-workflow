@@ -102,6 +102,10 @@ rule assembly:
         expand("assembly/spades-sc_{lib_sc}_q{qtrimvals}/scaffolds.fasta",
                lib_sc=config["libraries_sc"],
                qtrimvals=config["qtrimvals"]),
+        # Individual assemblies of each FACS-sorted metagenomic library
+        expand("assembly/spades_{lib_sort}_q{qtrimvals}/scaffolds.fasta",
+               lib_sort=config['libraries_sort'],
+               qtrimvals=config['qtrimvals']),
         # Combined assemblies of all bulk metagenomic libraries per species
         expand("assembly/{assembler}-comb_{sp}_q{qtrimvals}/scaffolds.fasta",
                assembler=['spades','megahit'],

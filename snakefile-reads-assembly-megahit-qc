@@ -21,8 +21,8 @@ rule bowtie_build_megahit_comb:
 rule bowtie_map_megahit_comb:
     # Map combined assembly with bowtie2
     input:
-        pe_reads_fwd=lambda wildcards: expand("data/reads-trim/{lib}_R1_ktrim_qtrim{qtrimvals}.fq.gz",lib=config['_'.join(['libraries',wildcards.sp])]['illumina-bulk'],qtrimvals=wildcards.qtrimvals),
-        pe_reads_rev=lambda wildcards: expand("data/reads-trim/{lib}_R2_ktrim_qtrim{qtrimvals}.fq.gz",lib=config['_'.join(['libraries',wildcards.sp])]['illumina-bulk'],qtrimvals=wildcards.qtrimvals),
+        pe_reads_fwd=lambda wildcards: expand("data/reads-trim/{lib}_R1_ktrim_qtrim{qtrimvals}.fq.gz",lib=config['libraries_by_sp'][wildcards.sp]['illumina-bulk'],qtrimvals=wildcards.qtrimvals),
+        pe_reads_rev=lambda wildcards: expand("data/reads-trim/{lib}_R2_ktrim_qtrim{qtrimvals}.fq.gz",lib=config['libraries_by_sp'][wildcards.sp]['illumina-bulk'],qtrimvals=wildcards.qtrimvals),
         scaffolds="assembly/megahit-comb_{sp}_q{qtrimvals}/scaffolds.fasta",
         bt2_index1="annotation/megahit-comb_{sp}_q{qtrimvals}/mapping/megahit-comb_{sp}_q{qtrimvals}.1.bt2",
     output:

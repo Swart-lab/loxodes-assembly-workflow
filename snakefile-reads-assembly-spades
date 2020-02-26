@@ -3,7 +3,7 @@
 # Combined list of input files for SPAdes combined assembly (metagenome)
 def combine_spades_input_files(wildcards):
     r12=expand("data/reads-trim/{lib}_R12_ktrim_qtrim{qtrimvals}.fq.gz",
-               lib=config['_'.join(['libraries',wildcards.sp])]['illumina-bulk'],
+               lib=config['libraries_by_sp'][wildcards.sp]['illumina-bulk'],
                qtrimvals=wildcards.qtrimvals)
     r12.sort()
     inargs=[]
@@ -15,7 +15,7 @@ def combine_spades_input_files(wildcards):
 rule spades_k127_comb:
     # Combined assembly for each species, using all metagenomic libraries available for that species
     input:
-        lambda wildcards: expand("data/reads-trim/{lib}_R12_ktrim_qtrim{qtrimvals}.fq.gz",lib=config['_'.join(['libraries',wildcards.sp])]['illumina-bulk'],qtrimvals=wildcards.qtrimvals)
+        lambda wildcards: expand("data/reads-trim/{lib}_R12_ktrim_qtrim{qtrimvals}.fq.gz",lib=config['libraries_by_sp'][wildcards.sp]['illumina-bulk'],qtrimvals=wildcards.qtrimvals)
     output:
         scaffolds="assembly/spades-comb_{sp}_q{qtrimvals}/scaffolds.fasta",
         fastg="assembly/spades-comb_{sp}_q{qtrimvals}/assembly_graph.fastg"

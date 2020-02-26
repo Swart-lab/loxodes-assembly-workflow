@@ -49,24 +49,40 @@ qtrimvals:
   - 2
   - 28
 
-# DNAseq libraries for species Lstr
-libraries_Lstr:
-  illumina-bulk:
-    - 4090_A
-    - 4090_B
-    - 4090_C
-  illumina-sc:
-    - 4091_C
-    - 4091_D
+# DNAseq libraries organized by species
 
-# DNAseq libraries for species Lmag
-libraries_Lmag:
-  illumina-bulk:
-    - 4090_D
-    - 4090_E
-  illumina-sc:
-    - 4091_E
-    - 4091_F
+libraries_by_sp:
+  Lstr:
+    illumina-bulk:
+      - 4090_A
+      - 4090_B
+      - 4090_C
+    illumina-sc:
+      - 4091_C
+      - 4091_D
+  Lmag:
+    illumina-bulk:
+      - 4090_D
+      - 4090_E
+    illumina-sc:
+      - 4091_E
+      - 4091_F
+  LstrMAC:
+    illumina-bulk:
+      - 4519_A
+      - 4519_C
+  LstrMIC:
+    illumina-bulk:
+      - 4519_B
+      - 4519_D
+  LmagMAC:
+    illumina-bulk:
+      - 4519_E
+      - 4519_G
+  LmagMIC:
+    illumina-bulk:
+      - 4519_F
+      - 4519_H
 
 # List of all Loxodes bulk metagenome DNAseq libraries
 libraries_lox:
@@ -93,6 +109,17 @@ libraries_sc:
   - 4091_D
   - 4091_E
   - 4091_F
+
+# List of all FACS sorted DNAseq libraries
+libraries_sort:
+  - 4519_A
+  - 4519_B
+  - 4519_C
+  - 4519_D
+  - 4519_E
+  - 4519_F
+  - 4519_G
+  - 4519_H
 
 # List of all RNAseq libraries
 libraries_rnaseq:
