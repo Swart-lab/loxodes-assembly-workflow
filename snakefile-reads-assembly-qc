@@ -86,3 +86,15 @@ rule calculate_cds_dens:
         prefix="annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}"
     shell:
         "perl code/bin_by_coding_density.pl --in {input.assembly} --gff {input.gff} --out {params.prefix} --no-fasta"
+
+rule bin_cds_dens_gc_loxodes:
+    # Bin genome assemblies by coding density < 0.5 and GC < 0.4
+    input:
+        assembly="assembly/{assembler}_{lib}_q{qtrimvals}/scaffolds.fasta",
+        gff="annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.prodigal.gff"
+    output:
+        "annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.bin_cds50_gc40.fasta"
+    params:
+        prefix="annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.bin_cds50_gc40"
+    shell:
+        "perl code/bin_by_coding_density.pl --in {input.assembly} --gff {input.gff} --out {params.prefix} --no-table --fasta --cds-dens-max 0.5 --gc-max 0.4"

@@ -9,6 +9,9 @@ include: "snakefile-reads-rnaseq-assembly"
 
 rule annotation_megahit_comb:
     input:
+        expand("annotation/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}.bin_cds50_gc40.fasta",
+               sp=config['species'],
+               qtrimvals=[28]),
         expand("annotation/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}.bt2.blobplot.png",
                sp=config['species'],
                qtrimvals=[28]),
@@ -27,6 +30,9 @@ rule annotation_megahit_comb:
 rule annotation_spades_comb:
     # Annotate each combined metagenomic assembly
     input:
+        expand("annotation/spades-comb_{sp}_q{qtrimvals}/spades-comb_{sp}_q{qtrimvals}.bin_cds50_gc40.fasta",
+               sp=config['species'],
+               qtrimvals=[28]),
         # expand("annotation/spades-comb_{sp}_q{qtrimvals}/mapping/spades-comb_{sp}_q{qtrimvals}.sort.bam",
         expand("annotation/spades-comb_{sp}_q{qtrimvals}/spades-comb_{sp}_q{qtrimvals}.bt2.blobplot.png",
                sp=config['species'],
@@ -65,6 +71,9 @@ rule annotation_spades_comb:
 rule annotation_spades_sc:
     # Annotate each single-cell MDA assembly
     input:
+        expand("annotation/spades-sc_{lib}_q{qtrimvals}/spades-sc_{lib}_q{qtrimvals}.bin_cds50_gc40.fasta",
+               lib=config['libraries_sc'],
+               qtrimvals=config['qtrimvals']),
         # expand("annotation/spades-sc_{lib}_q{qtrimvals}/spades-sc_{lib}_q{qtrimvals}.scaffolds.covstats",
         expand("annotation/spades-sc_{lib}_q{qtrimvals}/spades-sc_{lib}_q{qtrimvals}.bt2.blobplot.png",
                lib=config['libraries_sc'],
