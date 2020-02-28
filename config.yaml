@@ -67,19 +67,19 @@ libraries_by_sp:
     illumina-sc:
       - 4091_E
       - 4091_F
-  LstrMAC:
+  LmagMAC:
     illumina-bulk:
       - 4519_A
       - 4519_C
-  LstrMIC:
+  LmagMIC:
     illumina-bulk:
       - 4519_B
       - 4519_D
-  LmagMAC:
+  LstrMAC:
     illumina-bulk:
       - 4519_E
       - 4519_G
-  LmagMIC:
+  LstrMIC:
     illumina-bulk:
       - 4519_F
       - 4519_H
