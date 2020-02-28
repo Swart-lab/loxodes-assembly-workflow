@@ -40,7 +40,7 @@
     "spades_k127_comb" :
     {
         "n" : "16",
-        "mem" : "24",
+        "mem" : "7.5",
         "time" : "72:0:0"
     },
     "megahit_k141_comb" :
@@ -58,7 +58,7 @@
     "spades_k127_mg" :
     {
         "n" : "16",
-        "mem" : "12",
+        "mem" : "4",
         "time" : "48:0:0"
     },
     "spades_k127_sc" :
