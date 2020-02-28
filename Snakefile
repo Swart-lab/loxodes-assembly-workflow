@@ -92,7 +92,8 @@ rule assembly_rnaseq:
         # Combined assemblies of RNAseq libraries, combined by experiment
         expand("assembly/trinity_rnaseq_{experiment}_nochlamy_comb/trinity_outdir/Trinity.fasta",
                experiment=["exp146"])
-rule assembly:
+
+rule assembly_indiv:
     input:
         # Individual assemblies of each bulk metagenomic library
         # expand("assembly/spades_{lib_mg}_q{qtrimvals}/scaffolds.fasta",
@@ -105,7 +106,10 @@ rule assembly:
         # Individual assemblies of each FACS-sorted metagenomic library
         expand("assembly/spades_{lib_sort}_q{qtrimvals}/scaffolds.fasta",
                lib_sort=config['libraries_sort'],
-               qtrimvals=config['qtrimvals']),
+               qtrimvals=[28]),
+
+rule assembly_comb:
+    input:
         # Combined assemblies of all bulk metagenomic libraries per species
         expand("assembly/{assembler}-comb_{sp}_q{qtrimvals}/scaffolds.fasta",
                assembler=['spades','megahit'],
