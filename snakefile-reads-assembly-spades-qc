@@ -100,18 +100,19 @@ rule bowtie_map_spades_comb:
         cor_fwd=get_spades_multiple_input_corr_reads_fwd,
         cor_rev=get_spades_multiple_input_corr_reads_rev
     output:
-        bam="annotation/spades-comb_{sp}_q{qtrimvals}/mapping/spades-comb_{sp}_q{qtrimvals}.bam",
         bamsort="annotation/spades-comb_{sp}_q{qtrimvals}/mapping/spades-comb_{sp}_q{qtrimvals}.sort.bam"
     log: "logs/bowtie_map_spades_comb.{sp}_q{qtrimvals}.log"
     threads: 16
     conda: "envs/bowtie2.yml"
     params:
+        bam="annotation/spades-comb_{sp}_q{qtrimvals}/mapping/spades-comb_{sp}_q{qtrimvals}.bam",
         prefix="annotation/spades-comb_{sp}_q{qtrimvals}/mapping/spades-comb_{sp}_q{qtrimvals}",
         inarg=lambda wildcards: ','.join(get_spades_multiple_input_corr_reads_fwd(wildcards)),
         in2arg=lambda wildcards: ','.join(get_spades_multiple_input_corr_reads_rev(wildcards))
     shell:
-        "bowtie2 --very-fast --no-unal --threads {threads} -x {params.prefix} -1 {params.inarg} -2 {params.in2arg} | samtools view -bS > {output.bam};"
-        "samtools sort --threads 16 -o {output.bamsort} --reference {input.scaffolds} {output.bam};"
+        "bowtie2 --very-fast --no-unal --threads {threads} -x {params.prefix} -1 {params.inarg} -2 {params.in2arg} | samtools view -bS > {params.bam};"
+        "samtools sort --threads 16 -o {output.bamsort} --reference {input.scaffolds} {params.bam};"
+        "rm {params.bam};"
 
 rule bowtie_map_indiv:
     # Map individual assembly with bowtie2
@@ -124,7 +125,6 @@ rule bowtie_map_indiv:
         # cor_fwd=get_spades_multiple_input_corr_reads_fwd,
         # cor_rev=get_spades_multiple_input_corr_reads_rev
     output:
-        bam="annotation/{assembler}_{lib}_q{qtrimvals}/mapping/{assembler}_{lib}_q{qtrimvals}.bam",
         bamsort="annotation/{assembler}_{lib}_q{qtrimvals}/mapping/{assembler}_{lib}_q{qtrimvals}.sort.bam"
     log: "logs/bowtie_map_indiv.{assembler}.{lib}_q{qtrimvals}.log"
     threads: 16
@@ -132,12 +132,14 @@ rule bowtie_map_indiv:
     wildcard_constraints:
         assembler="[^_]+(?<!comb)" # Negate underscore character so that the assembler and lib wildcards are split properly, negative lookbehind for 'comb' to avoid applying this rule to combined assemblies
     params:
+        bam="annotation/{assembler}_{lib}_q{qtrimvals}/mapping/{assembler}_{lib}_q{qtrimvals}.bam",
         prefix="annotation/{assembler}_{lib}_q{qtrimvals}/mapping/{assembler}_{lib}_q{qtrimvals}"
         # inarg=lambda wildcards: ','.join(get_spades_multiple_input_corr_reads_fwd(wildcards)),
         # in2arg=lambda wildcards: ','.join(get_spades_multiple_input_corr_reads_rev(wildcards))
     shell:
-        "bowtie2 --very-fast --no-unal --threads {threads} -x {params.prefix} -1 {input.cor_fwd} -2 {input.cor_rev} | samtools view -bS > {output.bam};"
-        "samtools sort --threads 16 -o {output.bamsort} --reference {input.scaffolds} {output.bam};"
+        "bowtie2 --very-fast --no-unal --threads {threads} -x {params.prefix} -1 {input.cor_fwd} -2 {input.cor_rev} | samtools view -bS > {params.bam};"
+        "samtools sort --threads 16 -o {output.bamsort} --reference {input.scaffolds} {params.bam};"
+        "rm {params.bam};"
 
 rule bowtie_map_spades_comb_samtools_depth:
     # Get coverage from sorted BAM file of bowtie2 mapping reads to combined metagenomic assemblies

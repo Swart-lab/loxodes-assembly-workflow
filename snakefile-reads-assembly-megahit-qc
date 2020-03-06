@@ -26,18 +26,19 @@ rule bowtie_map_megahit_comb:
         scaffolds="assembly/megahit-comb_{sp}_q{qtrimvals}/scaffolds.fasta",
         bt2_index1="annotation/megahit-comb_{sp}_q{qtrimvals}/mapping/megahit-comb_{sp}_q{qtrimvals}.1.bt2",
     output:
-        bam="annotation/megahit-comb_{sp}_q{qtrimvals}/mapping/megahit-comb_{sp}_q{qtrimvals}.bam",
         bamsort="annotation/megahit-comb_{sp}_q{qtrimvals}/mapping/megahit-comb_{sp}_q{qtrimvals}.sort.bam"
     log: "logs/bowtie_map_megahit_comb.{sp}_q{qtrimvals}.log"
     threads: 16
     conda: "envs/bowtie2.yml"
     params:
+        bam="annotation/megahit-comb_{sp}_q{qtrimvals}/mapping/megahit-comb_{sp}_q{qtrimvals}.bam",
         prefix="annotation/megahit-comb_{sp}_q{qtrimvals}/mapping/megahit-comb_{sp}_q{qtrimvals}",
         inarg_fwd=combine_megahit_input_files_fwd,
         inarg_rev=combine_megahit_input_files_rev
     shell:
-        "bowtie2 --very-fast --no-unal --threads {threads} -x {params.prefix} -1 {params.inarg_fwd} -2 {params.inarg_rev} | samtools view -bS > {output.bam};"
-        "samtools sort --threads 16 -o {output.bamsort} --reference {input.scaffolds} {output.bam};"
+        "bowtie2 --very-fast --no-unal --threads {threads} -x {params.prefix} -1 {params.inarg_fwd} -2 {params.inarg_rev} | samtools view -bS > {params.bam};"
+        "samtools sort --threads 16 -o {output.bamsort} --reference {input.scaffolds} {params.bam};"
+        "rm {params.bam};
 
 rule bowtie_map_megahit_comb_samtools_depth:
     # Get coverage from sorted BAM file of bowtie2 mapping reads to combined metagenomic assemblies
