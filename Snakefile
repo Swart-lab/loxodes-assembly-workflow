@@ -22,10 +22,10 @@ rule annotation_megahit_comb:
                sp=config['species'],
                qtrimvals=[28],
                kingdom=config['barrnap_kingdoms']),
-        expand("annotation/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}.{rrnagene}.nhmmer.out",
-               sp=config['species'],
-               rrnagene=config['ciliate_mt_rRNA'],
-               qtrimvals=[28])
+        # expand("annotation/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}.{rrnagene}.nhmmer.out",
+        #        sp=config['species'],
+        #        rrnagene=config['ciliate_mt_rRNA'],
+        #        qtrimvals=[28])
 
 rule annotation_spades_comb:
     # Annotate each combined metagenomic assembly
@@ -44,10 +44,10 @@ rule annotation_spades_comb:
                sp=config['species'],
                qtrimvals=[28],
                kingdom=config['barrnap_kingdoms']),
-        expand("annotation/spades-comb_{sp}_q{qtrimvals}/spades-comb_{sp}_q{qtrimvals}.{rrnagene}.nhmmer.out",
-               sp=config['species'],
-               rrnagene=config['ciliate_mt_rRNA'],
-               qtrimvals=[28]),
+        # expand("annotation/spades-comb_{sp}_q{qtrimvals}/spades-comb_{sp}_q{qtrimvals}.{rrnagene}.nhmmer.out",
+        #        sp=config['species'],
+        #        rrnagene=config['ciliate_mt_rRNA'],
+        #        qtrimvals=[28]),
         expand("annotation/spades-comb_{sp}_q{qtrimvals}/spades-comb_{sp}_q{qtrimvals}.cds-dens.tsv",
                sp=config['species'],
                qtrimvals=[28])
