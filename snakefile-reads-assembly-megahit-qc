@@ -38,7 +38,7 @@ rule bowtie_map_megahit_comb:
     shell:
         "bowtie2 --very-fast --no-unal --threads {threads} -x {params.prefix} -1 {params.inarg_fwd} -2 {params.inarg_rev} | samtools view -bS > {params.bam};"
         "samtools sort --threads 16 -o {output.bamsort} --reference {input.scaffolds} {params.bam};"
-        "rm {params.bam};
+        "rm {params.bam};"
 
 rule bowtie_map_megahit_comb_samtools_depth:
     # Get coverage from sorted BAM file of bowtie2 mapping reads to combined metagenomic assemblies
