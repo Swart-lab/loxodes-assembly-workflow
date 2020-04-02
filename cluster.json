@@ -98,6 +98,18 @@
         "mem" : "2",
         "time" : "1:0:0"
     },
+    "hisat_index_assembly":
+    {
+        "n" : "4",
+        "mem" : "8",
+        "time" : "4:0:0"
+    },
+    "hisat_rnaseq_map_to_genome":
+    {
+        "n" : "8",
+        "mem" : "3",
+        "time" : "4:0:0"
+    },
     "bbmap_covstats_spades_comb" :
     {
         "n" : "16",

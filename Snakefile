@@ -18,10 +18,10 @@ rule annotation_megahit_comb:
         # expand("annotation/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}.cds-dens.tsv",
         #        sp=config['species'],
         #        qtrimvals=[28])
-        expand("annotation/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}.barrnap.{kingdom}.Bandage.png",
-               sp=config['species'],
-               qtrimvals=[28],
-               kingdom=config['barrnap_kingdoms']),
+        # expand("annotation/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}.barrnap.{kingdom}.Bandage.png",
+        #        sp=config['species'],
+        #        qtrimvals=[28],
+        #        kingdom=config['barrnap_kingdoms']),
         # expand("annotation/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}.{rrnagene}.nhmmer.out",
         #        sp=config['species'],
         #        rrnagene=config['ciliate_mt_rRNA'],
@@ -40,10 +40,10 @@ rule annotation_spades_comb:
         # expand("annotation/spades-comb_{sp}_q{qtrimvals}/spades-comb_{sp}_q{qtrimvals}.scaffolds.covstats",
         #        sp=config['species'],
         #        qtrimvals=[28]),
-        expand("annotation/spades-comb_{sp}_q{qtrimvals}/spades-comb_{sp}_q{qtrimvals}.barrnap.{kingdom}.Bandage.png",
-               sp=config['species'],
-               qtrimvals=[28],
-               kingdom=config['barrnap_kingdoms']),
+        # expand("annotation/spades-comb_{sp}_q{qtrimvals}/spades-comb_{sp}_q{qtrimvals}.barrnap.{kingdom}.Bandage.png",
+        #        sp=config['species'],
+        #        qtrimvals=[28],
+        #        kingdom=config['barrnap_kingdoms']),
         # expand("annotation/spades-comb_{sp}_q{qtrimvals}/spades-comb_{sp}_q{qtrimvals}.{rrnagene}.nhmmer.out",
         #        sp=config['species'],
         #        rrnagene=config['ciliate_mt_rRNA'],
@@ -91,7 +91,13 @@ rule assembly_rnaseq:
     input:
         # Combined assemblies of RNAseq libraries, combined by experiment
         expand("assembly/trinity_rnaseq_{experiment}_nochlamy_comb/trinity_outdir/Trinity.fasta",
-               experiment=["exp146"])
+               experiment=["exp146"]),
+        expand("annotation/{assembler}_{sp}_q{qtrimvals}/hisat2.{lib}_q{qtrimvals}_nochlamy.{assembler}_{sp}_q{qtrimvals}.sort.bam",
+                lib=config['experiments_rnaseq']['exp146']['libraries'],
+                assembler=["spades-comb"],
+                sp=["LmagMAC"],
+                qtrimvals=[28])
+
 
 rule assembly_indiv:
     input:

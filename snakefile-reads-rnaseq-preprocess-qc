@@ -75,3 +75,40 @@ rule split_filter_rnaseq_chlamy_reads:
     log: "logs/split_filter_rnaseq_chlamy_reads.{lib}.q{qtrimvals}.log"
     shell:
         "reformat.sh -Xmx10g threads={threads} interleaved=t in={input} out={output.readf} out2={output.readr}"
+
+rule hisat_index_assembly:
+    # Index genome assembly with Hisat2 for splice-aware alignment of RNAseq reads onto genome
+    input: "assembly/{assembler}_{sp}_q{qtrimvals}/scaffolds.fasta"
+    output: # Index files for hisat2
+        "annotation/{assembler}_{sp}_q{qtrimvals}/{assembler}_{sp}_q{qtrimvals}.1.ht2"
+    params: 
+        prefix="annotation/{assembler}_{sp}_q{qtrimvals}/{assembler}_{sp}_q{qtrimvals}",
+        hisatbuildpath="/ebio/abt2_projects/ag-swart-loxodes/opt/hisat2-2.0.0-beta/hisat2-build", # custom build of Hisat2
+        seed="12345"
+    threads: 4
+    log: "logs/hisat_index_assembly.{assembler}_{sp}_q{qtrimvals}.log"
+    shell:
+        "{params.hisatbuildpath} -f -p {threads} --seed {params.seed} {input} {params.prefix} &> {log}"
+
+rule hisat_rnaseq_map_to_genome:
+    # Map RNAseq reads to genomic reference 
+    input:
+        assembly="assembly/{assembler}_{sp}_q{qtrimvals}/scaffolds.fasta",
+        readf="data/reads-rnaseq-filter/{lib}_R12_ktrim_qtrim{qtrimvals}_bbmap_nochlamy.R1.fq.gz",
+        readr="data/reads-rnaseq-filter/{lib}_R12_ktrim_qtrim{qtrimvals}_bbmap_nochlamy.R2.fq.gz",
+        index1="annotation/{assembler}_{sp}_q{qtrimvals}/{assembler}_{sp}_q{qtrimvals}.1.ht2"
+    output:
+        sam=temp("annotation/{assembler}_{sp}_q{qtrimvals}/hisat2.{lib}_q{qtrimvals}_nochlamy.{assembler}_{sp}_q{qtrimvals}.sam"),
+        bam=temp("annotation/{assembler}_{sp}_q{qtrimvals}/hisat2.{lib}_q{qtrimvals}_nochlamy.{assembler}_{sp}_q{qtrimvals}.bam"),
+        sortbam="annotation/{assembler}_{sp}_q{qtrimvals}/hisat2.{lib}_q{qtrimvals}_nochlamy.{assembler}_{sp}_q{qtrimvals}.sort.bam",
+        metfile="annotation/{assembler}_{sp}_q{qtrimvals}/hisat2.{lib}_q{qtrimvals}_nochlamy.{assembler}_{sp}_q{qtrimvals}.met"
+    log: "logs/hisat_rnaseq_map_to_genome.hisat2.{lib}_q{qtrimvals}_nochlamy.{assembler}_{sp}_q{qtrimvals}.log"
+    params:
+        prefix="annotation/{assembler}_{sp}_q{qtrimvals}/{assembler}_{sp}_q{qtrimvals}",
+        hisatpath="/ebio/abt2_projects/ag-swart-loxodes/opt/hisat2-2.0.0-beta/hisat2",
+        seed="12345"
+    threads: 8 # 2.5G memory, 4:0:0 run time, 8 threads
+    shell:
+        "{params.hisatpath} -q --rna-strandness RF --min-intronlen 10 --max-intronlen 50000 --met-file {output.metfile} --threads {threads} --seed {params.seed} -x {params.prefix} -1 {input.readf} -2 {input.readr} -S {output.sam} &> {log};"
+        "samtools view -b -T {input.assembly} -o {output.bam} -@ 7 {output.sam};"
+        "samtools sort -@ 7 -o {output.sortbam} {output.bam};"
