@@ -74,6 +74,13 @@
         "mail" : "abe",
         "time" : "36:0:0"
     },
+    "trinity_rnaseq_nochlamy_mapped_comb" :
+    {
+        "n" : "16",
+        "mem" : "8",
+        "mail" : "abe",
+        "time" : "36:0:0"
+    },
     "mt_rrna_hmm" :
     {
         "n" : "4",
