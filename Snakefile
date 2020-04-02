@@ -92,11 +92,12 @@ rule assembly_rnaseq:
         # Combined assemblies of RNAseq libraries, combined by experiment
         expand("assembly/trinity_rnaseq_{experiment}_nochlamy_comb/trinity_outdir/Trinity.fasta",
                experiment=["exp146"]),
-        expand("annotation/{assembler}_{sp}_q{qtrimvals}/hisat2.{lib}_q{qtrimvals}_nochlamy.{assembler}_{sp}_q{qtrimvals}.sort.bam",
+        expand("data/reads-rnaseq-genome-mapped/{lib}_q{qtrimvals}_nochlamy.{assembler}_{sp}_q{qtrimvals}.{dir}.fastq.gz",
                 lib=config['experiments_rnaseq']['exp146']['libraries'],
                 assembler=["spades-comb"],
                 sp=["LmagMAC"],
-                qtrimvals=[28])
+                qtrimvals=[28],
+                dir=["R1","R2"])
 
 
 rule assembly_indiv:

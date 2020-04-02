@@ -110,6 +110,12 @@
         "mem" : "3",
         "time" : "4:0:0"
     },
+    "hisat_rnaseq_mapped_reads_to_fastq":
+    {
+        "n": "12",
+        "mem" : "1",
+        "time" : "2:0:0"
+    },
     "bbmap_covstats_spades_comb" :
     {
         "n" : "16",
