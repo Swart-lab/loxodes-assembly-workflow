@@ -137,4 +137,5 @@ rule hisat_rnaseq_mapped_reads_to_fastq:
         "samtools view -@ 11 -bh -F 12 -o {output.bampairedmapped} {input.sortbam};" # Reads with both segments mapped
         "samtools merge -@ 11 {output.bammappedmerge} {output.bamfwdmapped} {output.bamrevmapped} {output.bampairedmapped};" # Merge filtered BAMs
         "mkdir -p {params.tmpdir};" # Make tmpdir to hold sort files
+        # Trinity is fussy about the header formatting of input reads in Fastq files. samtools fastq has to be called with -N option to append /1 /2 to read names in paired end files
         "samtools view -@ 3 -b -u {output.bammappedmerge} | samtools collate -n 128 -u -O -@ 3 - {params.tmpprefix} | samtools fastq -0 /dev/null -1 {output.readsf} -2 {output.readsr} -s {output.readsu} -N -@ 3 -;" # Collate reads by pair and output to Fastq format
