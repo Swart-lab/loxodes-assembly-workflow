@@ -41,7 +41,7 @@ rule megahit_k141_comb:
         outprefix="megahit-comb_{sp}_q{qtrimvals}",
         klist="21,29,39,59,79,99,119,141"
     shell:
-        "rm -r {params.outdir};" # Remove folder first because Snakemake will touch the folder and megahit will refuse to overwrite
+        "rm -rf {params.outdir};" # Remove folder first because Snakemake will touch the folder and megahit will refuse to overwrite
         "megahit --12 {params.pe_inargs} --memory {params.mem} --num-cpu-threads {threads} --k-list {params.klist} --out-dir {params.outdir} --out-prefix {params.outprefix} 2> {log};"
 
 rule megahit_k141_comb_tidy:

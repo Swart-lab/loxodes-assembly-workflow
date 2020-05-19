@@ -26,7 +26,7 @@ rule spades_k127_comb:
         pe_inargs=combine_spades_input_files
     shell:
         "spades.py {params.pe_inargs} -o assembly/spades-comb_{wildcards.sp}_q{wildcards.qtrimvals} --threads {threads} --memory 380 -k 21,33,55,77,99,127 &> {log};"
-        "rm -r assembly/spades-comb_{wildcards.sp}_q{wildcards.qtrimvals}/split_input;"
+        "rm -rf assembly/spades-comb_{wildcards.sp}_q{wildcards.qtrimvals}/split_input;"
 
 rule spades_k127_sc:
     # Individual assembly of each single-cell Illumina library
