@@ -41,12 +41,14 @@
     {
         "n" : "16",
         "mem" : "7.5",
+        "mail" : "abe",
         "time" : "72:0:0"
     },
     "megahit_k141_comb" :
     {
         "n" : "32",
         "mem" : "5",
+        "mail" : "abe",
         "time" : "10:0:0"
     },
     "megahit_k141_comb_tidy" :
@@ -59,12 +61,14 @@
     {
         "n" : "16",
         "mem" : "4",
+        "mail" : "abe",
         "time" : "48:0:0"
     },
     "spades_k127_sc" :
     {
         "n" : "16",
         "mem" : "8",
+        "mail" : "abe",
         "time" : "16:0:0"
     },
     "trinity_rnaseq_nochlamy_comb" :
