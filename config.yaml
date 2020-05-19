@@ -23,6 +23,10 @@ libraries:
   - 4519_F
   - 4519_G
   - 4519_H
+  - 4615_A
+  - 4615_B
+  - 4615_C
+  - 4615_D
 
 # List shortnames for all species
 species:
@@ -71,10 +75,14 @@ libraries_by_sp:
     illumina-bulk:
       - 4519_A
       - 4519_C
+      - 4615_A
+      - 4615_C
   LmagMIC:
     illumina-bulk:
       - 4519_B
       - 4519_D
+      - 4615_B
+      - 4615_D
   LstrMAC:
     illumina-bulk:
       - 4519_E
@@ -120,6 +128,10 @@ libraries_sort:
   - 4519_F
   - 4519_G
   - 4519_H
+  - 4615_A
+  - 4615_B
+  - 4615_C
+  - 4615_D
 
 # List of all RNAseq libraries
 libraries_rnaseq:
@@ -292,6 +304,66 @@ reads_raw:
       - data/reads/4519_H_run645_AGATGCTA_S72_L002_R1_001.fastq.gz
     rev:
       - data/reads/4519_H_run645_AGATGCTA_S72_L002_R2_001.fastq.gz
+  4615_A:
+    fwd:
+      - data/reads/4615_A_run653_GTCTTACA_S447_L006_R1_001.fastq.gz
+      - data/reads/4615_A_run653_GTCTTACA_S447_L006_R1_001_2.fastq.gz
+      - data/reads/4615_A_run653_GTCTTACA_S447_L007_R1_001.fastq.gz
+      - data/reads/4615_A_run653_GTCTTACA_S447_L007_R1_001_2.fastq.gz
+      - data/reads/4615_A_run653_GTCTTACA_S447_L008_R1_001.fastq.gz
+      - data/reads/4615_A_run653_GTCTTACA_S447_L008_R1_001_2.fastq.gz
+    rev:
+      - data/reads/4615_A_run653_GTCTTACA_S447_L006_R2_001.fastq.gz
+      - data/reads/4615_A_run653_GTCTTACA_S447_L006_R2_001_2.fastq.gz
+      - data/reads/4615_A_run653_GTCTTACA_S447_L007_R2_001.fastq.gz
+      - data/reads/4615_A_run653_GTCTTACA_S447_L007_R2_001_2.fastq.gz
+      - data/reads/4615_A_run653_GTCTTACA_S447_L008_R2_001.fastq.gz
+      - data/reads/4615_A_run653_GTCTTACA_S447_L008_R2_001_2.fastq.gz
+  4615_B:
+    fwd:
+      - data/reads/4615_B_run653_GCCGCATG_S448_L006_R1_001.fastq.gz
+      - data/reads/4615_B_run653_GCCGCATG_S448_L006_R1_001_2.fastq.gz
+      - data/reads/4615_B_run653_GCCGCATG_S448_L007_R1_001.fastq.gz
+      - data/reads/4615_B_run653_GCCGCATG_S448_L007_R1_001_2.fastq.gz
+      - data/reads/4615_B_run653_GCCGCATG_S448_L008_R1_001.fastq.gz
+      - data/reads/4615_B_run653_GCCGCATG_S448_L008_R1_001_2.fastq.gz
+    rev:
+      - data/reads/4615_B_run653_GCCGCATG_S448_L006_R2_001.fastq.gz
+      - data/reads/4615_B_run653_GCCGCATG_S448_L006_R2_001_2.fastq.gz
+      - data/reads/4615_B_run653_GCCGCATG_S448_L007_R2_001.fastq.gz
+      - data/reads/4615_B_run653_GCCGCATG_S448_L007_R2_001_2.fastq.gz
+      - data/reads/4615_B_run653_GCCGCATG_S448_L008_R2_001.fastq.gz
+      - data/reads/4615_B_run653_GCCGCATG_S448_L008_R2_001_2.fastq.gz
+  4615_C:
+    fwd:
+      - data/reads/4615_C_run653_CTGCACAT_S449_L006_R1_001.fastq.gz
+      - data/reads/4615_C_run653_CTGCACAT_S449_L006_R1_001_2.fastq.gz
+      - data/reads/4615_C_run653_CTGCACAT_S449_L007_R1_001.fastq.gz
+      - data/reads/4615_C_run653_CTGCACAT_S449_L007_R1_001_2.fastq.gz
+      - data/reads/4615_C_run653_CTGCACAT_S449_L008_R1_001.fastq.gz
+      - data/reads/4615_C_run653_CTGCACAT_S449_L008_R1_001_2.fastq.gz
+    rev:
+      - data/reads/4615_C_run653_CTGCACAT_S449_L006_R2_001.fastq.gz
+      - data/reads/4615_C_run653_CTGCACAT_S449_L006_R2_001_2.fastq.gz
+      - data/reads/4615_C_run653_CTGCACAT_S449_L007_R2_001.fastq.gz
+      - data/reads/4615_C_run653_CTGCACAT_S449_L007_R2_001_2.fastq.gz
+      - data/reads/4615_C_run653_CTGCACAT_S449_L008_R2_001.fastq.gz
+      - data/reads/4615_C_run653_CTGCACAT_S449_L008_R2_001_2.fastq.gz
+  4615_D:
+    fwd:
+      - data/reads/4615_D_run653_CGTGTCTA_S450_L006_R1_001.fastq.gz
+      - data/reads/4615_D_run653_CGTGTCTA_S450_L006_R1_001_2.fastq.gz
+      - data/reads/4615_D_run653_CGTGTCTA_S450_L007_R1_001.fastq.gz
+      - data/reads/4615_D_run653_CGTGTCTA_S450_L007_R1_001_2.fastq.gz
+      - data/reads/4615_D_run653_CGTGTCTA_S450_L008_R1_001.fastq.gz
+      - data/reads/4615_D_run653_CGTGTCTA_S450_L008_R1_001_2.fastq.gz
+    rev:
+      - data/reads/4615_D_run653_CGTGTCTA_S450_L006_R2_001.fastq.gz
+      - data/reads/4615_D_run653_CGTGTCTA_S450_L006_R2_001_2.fastq.gz
+      - data/reads/4615_D_run653_CGTGTCTA_S450_L007_R2_001.fastq.gz
+      - data/reads/4615_D_run653_CGTGTCTA_S450_L007_R2_001_2.fastq.gz
+      - data/reads/4615_D_run653_CGTGTCTA_S450_L008_R2_001.fastq.gz
+      - data/reads/4615_D_run653_CGTGTCTA_S450_L008_R2_001_2.fastq.gz
 
 #  List of all raw RNAseq reads, organized by sequence library
 reads_rnaseq_raw:
