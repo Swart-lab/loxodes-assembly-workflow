@@ -98,3 +98,12 @@ rule bin_cds_dens_gc_loxodes:
         prefix="annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.bin_cds50_gc40"
     shell:
         "perl code/bin_by_coding_density.pl --in {input.assembly} --gff {input.gff} --out {params.prefix} --no-table --fasta --cds-dens-max 0.5 --gc-max 0.4"
+
+rule filter_assembly_min500:
+    # Filter out sequences < 500 bp length in assembly
+    input:
+        assembly="assembly/{assembler}_{lib}_q{qtrimvals}/scaffolds.fasta"
+    output:
+        "annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.min500.fasta"
+    shell:
+        "opt/kentutils/faFilter -minSize=500 {input.assembly} {output}"
