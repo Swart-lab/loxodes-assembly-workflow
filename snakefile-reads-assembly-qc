@@ -71,7 +71,7 @@ rule bin_cds_dens_gc_loxodes:
     output:
         "annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.bin_cds50_gc40.fasta"
     log:
-        "logs/bin_cds_dens_gc_loxodes.{assembler}_{lib}_q{qtrimals}.log"
+        "logs/bin_cds_dens_gc_loxodes.{assembler}_{lib}_q{qtrimvals}.log"
     params:
         prefix="annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.bin_cds50_gc40"
     shell:
