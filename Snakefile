@@ -1,11 +1,19 @@
 include: "snakefile-reads-assembly-spades"
 include: "snakefile-reads-assembly-megahit"
+include: "snakefile-reads-assembly-flye"
 include: "snakefile-reads-assembly-spades-qc"
 include: "snakefile-reads-assembly-megahit-qc"
 include: "snakefile-reads-assembly-qc"
 include: "snakefile-reads-preprocess-qc"
 include: "snakefile-reads-rnaseq-preprocess-qc"
 include: "snakefile-reads-rnaseq-assembly"
+
+rule annotation_flye_comb:
+    input:
+        expand("annotation/flye-comb_{sp}/flye-comb_{sp}.gbtquick.blobplot.png",
+                sp=['LmagMAC','LmagMIC']),
+        expand("annotation/flye-comb_{sp}/flye-comb_{sp}.gbtquick.covstats.tsv",
+                sp=['LmagMAC','LmagMIC']),
 
 rule annotation_megahit_comb:
     input:
@@ -82,6 +90,11 @@ rule assembly_illumina_comb:
                assembler=['spades','megahit'],
                sp=config['species'],
                qtrimvals=[28])
+
+rule assembly_flye_comb:
+    input:
+        expand("assembly/flye-comb_{sp}/assembly.fasta",
+                sp=['LmagMAC','LmagMIC'])
 
 rule qc:
     input:

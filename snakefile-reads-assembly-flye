@@ -1,0 +1,31 @@
+rule flye_comb_ccs:
+    # Combined assembly for each species, using all metagenomic libraries available for that species
+    input:
+        lambda wildcards: expand("data/pb/{lib}_HIFI.fastq.gz",lib=config['libraries_by_sp'][wildcards.sp]['pb-ccs'])
+    output:
+        assembly="assembly/flye-comb_{sp}/assembly.fasta",
+        scaffolds="assembly/flye-comb_{sp}/scaffolds.fasta", # alias for consistency
+        assembly_info="assembly/flye-comb_{sp}/assembly_info.txt"
+    threads: 16
+    conda: "envs/flye.yml"
+    params:
+        prefix="assembly/flye-comb_{sp}"
+    log: "logs/flye_comb_ccs.{sp}.log"
+    shell:
+        "flye --threads {threads} --pacbio-hifi -o {params.prefix} {input} &> {log};"
+        "ln -sr {output.assembly} {output.scaffolds}" # -r relative link, else rule breaks
+
+rule gbtquick_flye_comb:
+    input:
+        scaffolds="assembly/flye-comb_{sp}/assembly.fasta",
+        assembly_info="assembly/flye-comb_{sp}/assembly_info.txt",
+        prodigal_gff="annotation/flye-comb_{sp}/flye-comb_{sp}.prodigal.gff"
+    conda: "envs/gbtquick.yml"
+    log: "logs/gbtquick_flye_comb.{sp}.log"
+    output:
+        covstats="annotation/flye-comb_{sp}/flye-comb_{sp}.gbtquick.covstats.tsv",
+        blobplot="annotation/flye-comb_{sp}/flye-comb_{sp}.gbtquick.blobplot.png"
+    params:
+        prefix="annotation/flye-comb_{sp}/flye-comb_{sp}.gbtquick"
+    shell:
+        "opt/gbtquick/gbtquick.py -a flye -f {input.scaffolds} -i {input.assembly_info} -o {params.prefix} --plot --plot_fmt png --prodigal_gff {input.prodigal_gff} &> {log}"

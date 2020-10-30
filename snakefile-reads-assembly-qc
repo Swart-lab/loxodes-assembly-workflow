@@ -54,12 +54,12 @@ rule mt_rrna_hmm:
 
 rule prodigal_for_cds_dens:
     input:
-        "assembly/{assembler}_{lib}_q{qtrimvals}/scaffolds.fasta"
+        "assembly/{assembly_folder}/scaffolds.fasta"
     output:
-        "annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.prodigal.gff"
+        "annotation/{assembly_folder}/{assembly_folder}.prodigal.gff"
     conda: "envs/prodigal.yml"
     threads: 16
-    log: "logs/prodigal_for_cds_dens.{assembler}_{lib}_q{qtrimvals}.log"
+    log: "logs/prodigal_for_cds_dens.{assembly_folder}.log"
     shell:
         "cat {input} | parallel --gnu -j {threads} --recstart '>' -N 100 --pipe prodigal -f gff -p meta -g 11 > {output} 2> {log}"
 

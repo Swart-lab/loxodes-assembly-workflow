@@ -1,0 +1,10 @@
+name: null
+channels:
+  - bioconda
+  - conda-forge
+  - r
+  - defaults
+dependencies:
+  - flye=2.8.1
+  - minimap2
+  - samtools
