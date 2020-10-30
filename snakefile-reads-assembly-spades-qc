@@ -1,3 +1,17 @@
+# Rules for QC and initial annotation of genomic DNAseq reads
+
+import glob # Needed for functions below
+
+rule quast_spades_k127_comb:
+    # Quality metrics of combined assembly
+    input:
+        expand("assembly/spades-comb_{sp}_q{qtrimvals}/scaffolds.fasta",sp=config['species'],qtrimvals=config['qtrimvals'])
+    output:
+        "qc/quast_spades_k127_comb/report.html"
+    threads: 16
+    conda: "envs/quast.yml"
+    log: "logs/quast_spades_k127_comb_{wildcards.sp}_q{wildcards.qtrimvals}.log"
+    shell:
         "quast.py -o qc/quast_spades_k127_comb -t {threads} -m 500 -s -L --large {input} &> {log}"
 
 def get_spades_multiple_input_corr_reads_fwd(wildcards):
@@ -38,6 +52,7 @@ rule gbtquick_spades_sc:
     shell:
         "opt/gbtquick/gbtquick.py -a spades -f {input.scaffolds} -o {params.prefix} --plot --plot_fmt png --prodigal_gff {input.prodigal_gff}"
 
+"""
 rule bbmap_covstats_spades_comb: # todel
     # Coverage stats of combined assembly, required for GC-coverage plot
     input:
@@ -194,3 +209,4 @@ rule bowtie_map_spades_comb_covstats: # todel
     threads: 2
     shell:
         "python3 code/samtools_depth_to_covstats.py --depth {input.depth} --fasta {input.scaffolds} --out {output} --log {log}"
+"""
