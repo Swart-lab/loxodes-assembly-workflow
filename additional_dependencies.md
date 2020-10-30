@@ -46,3 +46,8 @@ wget ftp://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/5.44-79.0/interproscan-5.44
 ```
 wget http://downloads.sourceforge.net/project/parafly/parafly-r2013-01-21.tgz
 ```
+
+# gbtquick
+```
+git clone git@github.com:Swart-lab/gbtquick.git
+```

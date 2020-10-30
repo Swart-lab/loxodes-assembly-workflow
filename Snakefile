@@ -12,20 +12,16 @@ rule annotation_megahit_comb:
         expand("annotation/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}.bin_cds50_gc40.fasta",
                sp=config['species'],
                qtrimvals=[28]),
-        expand("annotation/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}.bt2.blobplot.png",
+        expand("annotation/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}.gbtquick.blobplot.png",
                sp=config['species'],
                qtrimvals=[28]),
-        # expand("annotation/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}.cds-dens.tsv",
-        #        sp=config['species'],
-        #        qtrimvals=[28])
-        # expand("annotation/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}.barrnap.{kingdom}.Bandage.png",
-        #        sp=config['species'],
-        #        qtrimvals=[28],
-        #        kingdom=config['barrnap_kingdoms']),
-        # expand("annotation/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}.{rrnagene}.nhmmer.out",
-        #        sp=config['species'],
-        #        rrnagene=config['ciliate_mt_rRNA'],
-        #        qtrimvals=[28])
+        expand("annotation/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}.gbtquick.covstats.tsv",
+               sp=config['species'],
+               qtrimvals=[28]),
+        expand("annotation/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}.barrnap.{kingdom}.gff",
+               sp=config['species'],
+               qtrimvals=[28],
+               kingdom=config['barrnap_kingdoms']),
 
 rule annotation_spades_comb:
     # Annotate each combined metagenomic assembly
@@ -33,24 +29,16 @@ rule annotation_spades_comb:
         expand("annotation/spades-comb_{sp}_q{qtrimvals}/spades-comb_{sp}_q{qtrimvals}.bin_cds50_gc40.fasta",
                sp=config['species'],
                qtrimvals=[28]),
-        # expand("annotation/spades-comb_{sp}_q{qtrimvals}/mapping/spades-comb_{sp}_q{qtrimvals}.sort.bam",
-        expand("annotation/spades-comb_{sp}_q{qtrimvals}/spades-comb_{sp}_q{qtrimvals}.bt2.blobplot.png",
+        expand("annotation/spades-comb_{sp}_q{qtrimvals}/spades-comb_{sp}_q{qtrimvals}.gbtquick.blobplot.png",
                sp=config['species'],
                qtrimvals=[28]),
-        # expand("annotation/spades-comb_{sp}_q{qtrimvals}/spades-comb_{sp}_q{qtrimvals}.scaffolds.covstats",
-        #        sp=config['species'],
-        #        qtrimvals=[28]),
+        expand("annotation/spades-comb_{sp}_q{qtrimvals}/spades-comb_{sp}_q{qtrimvals}.gbtquick.covstats.tsv",
+               sp=config['species'],
+               qtrimvals=[28]),
         expand("annotation/spades-comb_{sp}_q{qtrimvals}/spades-comb_{sp}_q{qtrimvals}.barrnap.{kingdom}.gff",
                sp=config['species'],
                qtrimvals=[28],
                kingdom=config['barrnap_kingdoms']),
-        # expand("annotation/spades-comb_{sp}_q{qtrimvals}/spades-comb_{sp}_q{qtrimvals}.{rrnagene}.nhmmer.out",
-        #        sp=config['species'],
-        #        rrnagene=config['ciliate_mt_rRNA'],
-        #        qtrimvals=[28]),
-        expand("annotation/spades-comb_{sp}_q{qtrimvals}/spades-comb_{sp}_q{qtrimvals}.cds-dens.tsv",
-               sp=config['species'],
-               qtrimvals=[28])
 
 # rule annotation_spades:
 #     # Annotate each bulk metagenomic assembly
@@ -71,21 +59,15 @@ rule annotation_spades_comb:
 rule annotation_spades_sc:
     # Annotate each single-cell MDA assembly
     input:
+        expand("annotation/spades-sc_{lib}_q{qtrimvals}/spades-sc_{lib}_q{qtrimvals}.gbtquick.blobplot.png",
+               lib=config['libraries_sc'],
+               qtrimvals=config['qtrimvals']),
+        expand("annotation/spades-sc_{lib}_q{qtrimvals}/spades-sc_{lib}_q{qtrimvals}.gbtquick.covstats.tsv",
+               lib=config['libraries_sc'],
+               qtrimvals=config['qtrimvals']),
         expand("annotation/spades-sc_{lib}_q{qtrimvals}/spades-sc_{lib}_q{qtrimvals}.bin_cds50_gc40.fasta",
                lib=config['libraries_sc'],
                qtrimvals=config['qtrimvals']),
-        # expand("annotation/spades-sc_{lib}_q{qtrimvals}/spades-sc_{lib}_q{qtrimvals}.scaffolds.covstats",
-        expand("annotation/spades-sc_{lib}_q{qtrimvals}/spades-sc_{lib}_q{qtrimvals}.bt2.blobplot.png",
-               lib=config['libraries_sc'],
-               qtrimvals=config['qtrimvals']),
-        expand("annotation/spades-sc_{lib}_q{qtrimvals}/spades-sc_{lib}_q{qtrimvals}.barrnap.{kingdom}.Bandage.png",
-               lib=config['libraries_sc'],
-               qtrimvals=config['qtrimvals'],
-               kingdom=config['barrnap_kingdoms']),
-        expand("annotation/spades-sc_{lib}_q{qtrimvals}/spades-sc_{lib}_q{qtrimvals}.{rrnagene}.nhmmer.out",
-               lib=config['libraries_sc'],
-               rrnagene=config['ciliate_mt_rRNA'],
-               qtrimvals=config['qtrimvals'])
 
 rule assembly_rnaseq:
     input:
@@ -105,7 +87,7 @@ rule assembly_rnaseq:
         #         dir=["R1","R2"])
 
 
-rule assembly_indiv:
+rule assembly_illumina_sc:
     input:
         # Individual assemblies of each bulk metagenomic library
         # expand("assembly/spades_{lib_mg}_q{qtrimvals}/scaffolds.fasta",
@@ -116,11 +98,11 @@ rule assembly_indiv:
                lib_sc=config["libraries_sc"],
                qtrimvals=config["qtrimvals"]),
         # Individual assemblies of each FACS-sorted metagenomic library
-        expand("assembly/spades_{lib_sort}_q{qtrimvals}/scaffolds.fasta",
-               lib_sort=config['libraries_sort'],
-               qtrimvals=[28]),
+        # expand("assembly/spades_{lib_sort}_q{qtrimvals}/scaffolds.fasta",
+        #        lib_sort=config['libraries_sort'],
+        #        qtrimvals=[28]),
 
-rule assembly_comb:
+rule assembly_illumina_comb:
     input:
         # Combined assemblies of all bulk metagenomic libraries per species
         expand("assembly/{assembler}-comb_{sp}_q{qtrimvals}/scaffolds.fasta",

@@ -1,4 +1,4 @@
-rule bowtie_map_indiv_covstats:
+rule bowtie_map_indiv_covstats: # todel
     # Convert samtools depth file to covstats-like file
     input:
         depth="annotation/{assembler}_{lib}_q{qtrimvals}/mapping/{assembler}_{lib}_q{qtrimvals}.bt2.depth",
@@ -23,7 +23,7 @@ rule plot_bt2_covstats_cdsdens:
     shell: 
         "Rscript code/blobplot.R --covstats {input.covstats} --cdsdens {input.cdsdens} --out {output}"
 
-rule barrnap:
+rule barrnap: # todel
     # Screen assembly for rRNA genes
     input:
         "assembly/{assembler}_{lib}_q{qtrimvals}/scaffolds.fasta"
@@ -73,8 +73,9 @@ rule prodigal_for_cds_dens:
         "annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.prodigal.gff"
     conda: "envs/prodigal.yml"
     threads: 16
+    log: "logs/prodigal_for_cds_dens.{assembler}_{lib}_q{qtrimvals}.log"
     shell:
-        "cat {input} | parallel --gnu -j {threads} --recstart '>' -N 100 --pipe prodigal -f gff -p meta -g 11 > {output}"
+        "cat {input} | parallel --gnu -j {threads} --recstart '>' -N 100 --pipe prodigal -f gff -p meta -g 11 > {output} 2> {log}"
 
 rule calculate_cds_dens:
     input:

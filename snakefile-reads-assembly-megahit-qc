@@ -2,7 +2,21 @@
 
 import glob # Needed for functions below
 
-rule bowtie_build_megahit_comb:
+rule gbtquick_megahit_comb:
+    input:
+        scaffolds="assembly/megahit-comb_{sp}_q{qtrimvals}/scaffolds.fasta",
+        prodigal_gff="annotation/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}.prodigal.gff"
+    conda: "envs/gbtquick.yml"
+    log: "logs/gbtquick_megahit_comb.{sp}_q{qtrimvals}.log"
+    output:
+        covstats="annotation/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}.gbtquick.covstats.tsv",
+        blobplot="annotation/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}.gbtquick.blobplot.png"
+    params:
+        prefix="annotation/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}.gbtquick"
+    shell:
+        "opt/gbtquick/gbtquick.py -a megahit -f {input.scaffolds} -o {params.prefix} --plot --plot_fmt png --prodigal_gff {input.prodigal_gff} &> {log}"
+
+rule bowtie_build_megahit_comb: # todel
     # Build bowtie database of combined assembly, required for mapping
     input:
         scaffolds="assembly/megahit-comb_{sp}_q{qtrimvals}/scaffolds.fasta"
@@ -18,7 +32,7 @@ rule bowtie_build_megahit_comb:
         "touch annotation/megahit-comb_{wildcards.sp}_q{wildcards.qtrimvals}/mapping/DO_NOT_BACKUP_THIS_FOLDER;"
         "bowtie2-build --threads {threads} --seed {params.seed} {input.scaffolds} {params.prefix} &> {log}"
 
-rule bowtie_map_megahit_comb:
+rule bowtie_map_megahit_comb: # todel
     # Map combined assembly with bowtie2
     input:
         pe_reads_fwd=lambda wildcards: expand("data/reads-trim/{lib}_R1_ktrim_qtrim{qtrimvals}.fq.gz",lib=config['libraries_by_sp'][wildcards.sp]['illumina-bulk'],qtrimvals=wildcards.qtrimvals),
@@ -40,7 +54,7 @@ rule bowtie_map_megahit_comb:
         "samtools sort --threads 16 -o {output.bamsort} --reference {input.scaffolds} {params.bam};"
         "rm {params.bam};"
 
-rule bowtie_map_megahit_comb_samtools_depth:
+rule bowtie_map_megahit_comb_samtools_depth: # todel
     # Get coverage from sorted BAM file of bowtie2 mapping reads to combined metagenomic assemblies
     input:
         scaffolds="assembly/megahit-comb_{sp}_q{qtrimvals}/scaffolds.fasta",
@@ -53,7 +67,7 @@ rule bowtie_map_megahit_comb_samtools_depth:
     shell:
         "samtools depth -a --reference {input.scaffolds} -o {output} {input.bamsort} &> {log}"
 
-rule bowtie_map_megahit_comb_covstats:
+rule bowtie_map_megahit_comb_covstats: # todel
     # Convert samtools depth file to covstats-like file
     input:
         depth="annotation/megahit-comb_{sp}_q{qtrimvals}/mapping/megahit-comb_{sp}_q{qtrimvals}.bt2.depth",
