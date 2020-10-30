@@ -1,17 +1,3 @@
-rule bowtie_map_indiv_covstats: # todel
-    # Convert samtools depth file to covstats-like file
-    input:
-        depth="annotation/{assembler}_{lib}_q{qtrimvals}/mapping/{assembler}_{lib}_q{qtrimvals}.bt2.depth",
-        scaffolds="assembly/{assembler}_{lib}_q{qtrimvals}/scaffolds.fasta"
-    output:
-        "annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.bt2.covstats"
-    log: "logs/bowtie_map_indiv_covstats.{assembler}.{lib}_q{qtrimvals}.log"
-    threads: 2
-    wildcard_constraints:
-        assembler="[^_]+(?<!comb)" # Negate underscore character so that the assembler and lib wildcards are split properly, negative lookbehind for 'comb' to avoid applying this rule to combined assemblies
-    shell:
-        "python3 code/samtools_depth_to_covstats.py --depth {input.depth} --fasta {input.scaffolds} --out {output} --log {log}"
-
 rule plot_bt2_covstats_cdsdens:
     # Blob plot of metagenome assembly using covstats from Bowtie2, colored by CDS density
     input:
@@ -76,19 +62,6 @@ rule prodigal_for_cds_dens:
     log: "logs/prodigal_for_cds_dens.{assembler}_{lib}_q{qtrimvals}.log"
     shell:
         "cat {input} | parallel --gnu -j {threads} --recstart '>' -N 100 --pipe prodigal -f gff -p meta -g 11 > {output} 2> {log}"
-
-"""
-rule calculate_cds_dens: # todel
-    input:
-        assembly="assembly/{assembler}_{lib}_q{qtrimvals}/scaffolds.fasta",
-        gff="annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.prodigal.gff"
-    output:
-        "annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.cds-dens.tsv"
-    params:
-        prefix="annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}"
-    shell:
-        "perl code/bin_by_coding_density.pl --in {input.assembly} --gff {input.gff} --out {params.prefix} --no-fasta"
-"""
 
 rule bin_cds_dens_gc_loxodes:
     # Bin genome assemblies by coding density < 0.5 and GC < 0.4

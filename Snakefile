@@ -40,22 +40,6 @@ rule annotation_spades_comb:
                qtrimvals=[28],
                kingdom=config['barrnap_kingdoms']),
 
-# rule annotation_spades:
-#     # Annotate each bulk metagenomic assembly
-#     input:
-#         # expand("annotation/spades_{lib}_q{qtrimvals}/spades_{lib}_q{qtrimvals}.scaffolds.covstats",
-#         expand("annotation/spades_{lib}_q{qtrimvals}/spades_{lib}_q{qtrimvals}.bt2.blobplot.png",
-#                lib=config['libraries_mg'],
-#                qtrimvals=config['qtrimvals']),
-#         expand("annotation/spades_{lib}_q{qtrimvals}/spades_{lib}_q{qtrimvals}.barrnap.{kingdom}.Bandage.png",
-#                lib=config['libraries_mg'],
-#                qtrimvals=config['qtrimvals'],
-#                kingdom=config['barrnap_kingdoms']),
-#         expand("annotation/spades_{lib}_q{qtrimvals}/spades_{lib}_q{qtrimvals}.{rrnagene}.nhmmer.out",
-#                lib=config['libraries_mg'],
-#                rrnagene=config['ciliate_mt_rRNA'],
-#                qtrimvals=config['qtrimvals'])
-
 rule annotation_spades_sc:
     # Annotate each single-cell MDA assembly
     input:
@@ -79,28 +63,13 @@ rule assembly_rnaseq:
                 assembler=["spades-comb"],
                 sp=["LmagMAC"],
                 qtrimvals=[28])
-        # expand("data/reads-rnaseq-genome-mapped/{lib}_q{qtrimvals}_nochlamy.{assembler}_{sp}_q{qtrimvals}.{dir}.fastq.gz",
-        #         lib=config['experiments_rnaseq']['exp146']['libraries'],
-        #         assembler=["spades-comb"],
-        #         sp=["LmagMAC"],
-        #         qtrimvals=[28],
-        #         dir=["R1","R2"])
-
 
 rule assembly_illumina_sc:
     input:
-        # Individual assemblies of each bulk metagenomic library
-        # expand("assembly/spades_{lib_mg}_q{qtrimvals}/scaffolds.fasta",
-        #        lib_mg=config['libraries_mg'],
-        #        qtrimvals=config['qtrimvals']),
         # Individual assemblies of each single-cell MDA library
         expand("assembly/spades-sc_{lib_sc}_q{qtrimvals}/scaffolds.fasta",
                lib_sc=config["libraries_sc"],
                qtrimvals=config["qtrimvals"]),
-        # Individual assemblies of each FACS-sorted metagenomic library
-        # expand("assembly/spades_{lib_sort}_q{qtrimvals}/scaffolds.fasta",
-        #        lib_sort=config['libraries_sort'],
-        #        qtrimvals=[28]),
 
 rule assembly_illumina_comb:
     input:
