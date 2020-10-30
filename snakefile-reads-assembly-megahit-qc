@@ -16,6 +16,7 @@ rule gbtquick_megahit_comb:
     shell:
         "opt/gbtquick/gbtquick.py -a megahit -f {input.scaffolds} -o {params.prefix} --plot --plot_fmt png --prodigal_gff {input.prodigal_gff} &> {log}"
 
+"""
 rule bowtie_build_megahit_comb: # todel
     # Build bowtie database of combined assembly, required for mapping
     input:
@@ -78,3 +79,4 @@ rule bowtie_map_megahit_comb_covstats: # todel
     threads: 2
     shell:
         "python3 code/samtools_depth_to_covstats.py --depth {input.depth} --fasta {input.scaffolds} --out {output} --log {log}"
+"""

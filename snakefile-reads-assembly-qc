@@ -23,7 +23,7 @@ rule plot_bt2_covstats_cdsdens:
     shell: 
         "Rscript code/blobplot.R --covstats {input.covstats} --cdsdens {input.cdsdens} --out {output}"
 
-rule barrnap: # todel
+rule barrnap:
     # Screen assembly for rRNA genes
     input:
         "assembly/{assembler}_{lib}_q{qtrimvals}/scaffolds.fasta"
@@ -77,7 +77,8 @@ rule prodigal_for_cds_dens:
     shell:
         "cat {input} | parallel --gnu -j {threads} --recstart '>' -N 100 --pipe prodigal -f gff -p meta -g 11 > {output} 2> {log}"
 
-rule calculate_cds_dens:
+"""
+rule calculate_cds_dens: # todel
     input:
         assembly="assembly/{assembler}_{lib}_q{qtrimvals}/scaffolds.fasta",
         gff="annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.prodigal.gff"
@@ -87,18 +88,22 @@ rule calculate_cds_dens:
         prefix="annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}"
     shell:
         "perl code/bin_by_coding_density.pl --in {input.assembly} --gff {input.gff} --out {params.prefix} --no-fasta"
+"""
 
 rule bin_cds_dens_gc_loxodes:
     # Bin genome assemblies by coding density < 0.5 and GC < 0.4
     input:
         assembly="assembly/{assembler}_{lib}_q{qtrimvals}/scaffolds.fasta",
-        gff="annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.prodigal.gff"
+        covstats="annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.gbtquick.covstats.tsv"
     output:
         "annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.bin_cds50_gc40.fasta"
+    log:
+        "logs/bin_cds_dens_gc_loxodes.{assembler}_{lib}_q{qtrimals}.log"
     params:
         prefix="annotation/{assembler}_{lib}_q{qtrimvals}/{assembler}_{lib}_q{qtrimvals}.bin_cds50_gc40"
     shell:
-        "perl code/bin_by_coding_density.pl --in {input.assembly} --gff {input.gff} --out {params.prefix} --no-table --fasta --cds-dens-max 0.5 --gc-max 0.4"
+        "opt/gbtquick/bin_covstats.py --fasta {input.assembly} --covstats {input.covstats} --max_cds_dens 0.5 --max_gc 0.4 -o {params.prefix} &> {log};"
+        "opt/kentutils/faSomeRecords {input.assembly} {params.prefix}.filter.list {output}"
 
 rule filter_assembly_min500:
     # Filter out sequences < 500 bp length in assembly
