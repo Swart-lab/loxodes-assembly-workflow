@@ -24,6 +24,17 @@ def get_spades_multiple_input_corr_reads_rev(wildcards):
     r2.sort()
     return r2
 
+rule link_spades_assem_output:
+    input:
+        scaffolds="assembly/spades{options}/scaffolds.fasta",
+        fastg="assembly/spades{options}/assembly_graph.fastg"
+    output:
+        scaffolds="assembly/latest/spades{options}.scaffolds.fasta",
+        fastg="assembly/latest/spades{options}.assembly_graph.fastg"
+    shell:
+        "ln -sr {input.scaffolds} {output.scaffolds};"
+        "ln -sr {input.fastg} {output.fastg}"
+
 rule gbtquick_spades_comb:
     input:
         scaffolds="assembly/spades-comb_{sp}_q{qtrimvals}/scaffolds.fasta",

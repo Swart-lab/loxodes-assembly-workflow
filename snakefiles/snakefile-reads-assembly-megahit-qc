@@ -2,6 +2,17 @@
 
 import glob # Needed for functions below
 
+rule link_megahit_assem_output:
+    input:
+        scaffolds="assembly/megahit{options}/scaffolds.fasta",
+        fastg="assembly/megahit{options}/assembly_graph.fastg"
+    output:
+        scaffolds="assembly/latest/megahit{options}.scaffolds.fasta",
+        fastg="assembly/latest/megahit{options}.assembly_graph.fastg"
+    shell:
+        "ln -sr {input.scaffolds} {output.scaffolds};"
+        "ln -sr {input.fastg} {output.fastg}"
+
 rule gbtquick_megahit_comb:
     input:
         scaffolds="assembly/megahit-comb_{sp}_q{qtrimvals}/scaffolds.fasta",

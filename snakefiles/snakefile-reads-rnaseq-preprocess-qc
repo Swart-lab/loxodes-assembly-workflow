@@ -78,33 +78,33 @@ rule split_filter_rnaseq_chlamy_reads:
 
 rule hisat_index_assembly:
     # Index genome assembly with Hisat2 for splice-aware alignment of RNAseq reads onto genome
-    input: "assembly/{assembler}_{sp}_q{qtrimvals}/scaffolds.fasta"
+    input: "assembly/{ref_params}/scaffolds.fasta"
     output: # Index files for hisat2
-        "annotation/{assembler}_{sp}_q{qtrimvals}/mapping/{assembler}_{sp}_q{qtrimvals}.1.ht2"
+        "annotation/{ref_params}/mapping/{ref_params}.1.ht2"
     params: 
-        prefix="annotation/{assembler}_{sp}_q{qtrimvals}/mapping/{assembler}_{sp}_q{qtrimvals}",
+        prefix="annotation/{ref_params}/mapping/{ref_params}",
         hisatbuildpath="/ebio/abt2_projects/ag-swart-loxodes/opt/hisat2-2.0.0-beta/hisat2-build", # custom build of Hisat2
         seed="12345"
     threads: 4
-    log: "logs/hisat_index_assembly.{assembler}_{sp}_q{qtrimvals}.log"
+    log: "logs/hisat_index_assembly.{ref_params}.log"
     shell:
         "{params.hisatbuildpath} -f -p {threads} --seed {params.seed} {input} {params.prefix} &> {log}"
 
 rule hisat_rnaseq_map_to_genome:
     # Map RNAseq reads to genomic reference 
     input:
-        assembly="assembly/{assembler}_{sp}_q{qtrimvals}/scaffolds.fasta",
+        assembly="assembly/{ref_params}/scaffolds.fasta",
         readf="data/reads-rnaseq-filter/{lib}_R12_ktrim_qtrim{qtrimvals}_bbmap_nochlamy.R1.fq.gz",
         readr="data/reads-rnaseq-filter/{lib}_R12_ktrim_qtrim{qtrimvals}_bbmap_nochlamy.R2.fq.gz",
-        index1="annotation/{assembler}_{sp}_q{qtrimvals}/mapping/{assembler}_{sp}_q{qtrimvals}.1.ht2"
+        index1="annotation/{ref_params}/mapping/{ref_params}.1.ht2"
     output:
-        sam=temp("annotation/{assembler}_{sp}_q{qtrimvals}/mapping/hisat2.{lib}_q{qtrimvals}_nochlamy.{assembler}_{sp}_q{qtrimvals}.sam"),
-        bam=temp("annotation/{assembler}_{sp}_q{qtrimvals}/mapping/hisat2.{lib}_q{qtrimvals}_nochlamy.{assembler}_{sp}_q{qtrimvals}.bam"),
-        sortbam="annotation/{assembler}_{sp}_q{qtrimvals}/mapping/hisat2.{lib}_q{qtrimvals}_nochlamy.{assembler}_{sp}_q{qtrimvals}.sort.bam",
-        metfile="annotation/{assembler}_{sp}_q{qtrimvals}/mapping/hisat2.{lib}_q{qtrimvals}_nochlamy.{assembler}_{sp}_q{qtrimvals}.met"
-    log: "logs/hisat_rnaseq_map_to_genome.hisat2.{lib}_q{qtrimvals}_nochlamy.{assembler}_{sp}_q{qtrimvals}.log"
+        sam=temp("annotation/{ref_params}/mapping/hisat2.{lib}_q{qtrimvals}_nochlamy.{ref_params}.sam"),
+        bam=temp("annotation/{ref_params}/mapping/hisat2.{lib}_q{qtrimvals}_nochlamy.{ref_params}.bam"),
+        sortbam="annotation/{ref_params}/mapping/hisat2.{lib}_q{qtrimvals}_nochlamy.{ref_params}.sort.bam",
+        metfile="annotation/{ref_params}/mapping/hisat2.{lib}_q{qtrimvals}_nochlamy.{ref_params}.met"
+    log: "logs/hisat_rnaseq_map_to_genome.hisat2.{lib}_q{qtrimvals}_nochlamy.{ref_params}.log"
     params:
-        prefix="annotation/{assembler}_{sp}_q{qtrimvals}/mapping/{assembler}_{sp}_q{qtrimvals}",
+        prefix="annotation/{ref_params}/mapping/{ref_params}",
         hisatpath="/ebio/abt2_projects/ag-swart-loxodes/opt/hisat2-2.0.0-beta/hisat2",
         seed="12345"
     threads: 8 # 2.5G memory, 4:0:0 run time, 8 threads
@@ -116,21 +116,21 @@ rule hisat_rnaseq_map_to_genome:
 rule hisat_rnaseq_mapped_reads_to_fastq:
     # Convert RNAseq that have mapped to genomic reference to Fastq format for assembly
     input:
-        sortbam="annotation/{assembler}_{sp}_q{qtrimvals}/mapping/hisat2.{lib}_q{qtrimvals}_nochlamy.{assembler}_{sp}_q{qtrimvals}.sort.bam"
+        sortbam="annotation/{ref_params}/mapping/hisat2.{lib}_q{qtrimvals}_nochlamy.{ref_params}.sort.bam"
     output:
-        bampairedmapped=temp("annotation/{assembler}_{sp}_q{qtrimvals}/mapping/hisat2.{lib}_q{qtrimvals}_nochlamy.{assembler}_{sp}_q{qtrimvals}.mapped1.bam"),
-        bamfwdmapped=temp("annotation/{assembler}_{sp}_q{qtrimvals}/mapping/hisat2.{lib}_q{qtrimvals}_nochlamy.{assembler}_{sp}_q{qtrimvals}.mapped2.bam"),
-        bamrevmapped=temp("annotation/{assembler}_{sp}_q{qtrimvals}/mapping/hisat2.{lib}_q{qtrimvals}_nochlamy.{assembler}_{sp}_q{qtrimvals}.mapped3.bam"),
-        bammappedmerge=temp("annotation/{assembler}_{sp}_q{qtrimvals}/mapping/hisat2.{lib}_q{qtrimvals}_nochlamy.{assembler}_{sp}_q{qtrimvals}.mapped.merge.bam"),
-        readsf="data/reads-rnaseq-genome-mapped/{lib}_q{qtrimvals}_nochlamy.{assembler}_{sp}_q{qtrimvals}.R1.fastq.gz",
-        readsr="data/reads-rnaseq-genome-mapped/{lib}_q{qtrimvals}_nochlamy.{assembler}_{sp}_q{qtrimvals}.R2.fastq.gz",
-        readsu="data/reads-rnaseq-genome-mapped/{lib}_q{qtrimvals}_nochlamy.{assembler}_{sp}_q{qtrimvals}.U.fastq.gz"
-    log: "logs/hisat_rnaseq_mapped_reads_to_fastq.{lib}_q{qtrimvals}_nochlamy.{assembler}_{sp}_q{qtrimvals}.log"
+        bampairedmapped=temp("annotation/{ref_params}/mapping/hisat2.{lib}_q{qtrimvals}_nochlamy.{ref_params}.mapped1.bam"),
+        bamfwdmapped=temp("annotation/{ref_params}/mapping/hisat2.{lib}_q{qtrimvals}_nochlamy.{ref_params}.mapped2.bam"),
+        bamrevmapped=temp("annotation/{ref_params}/mapping/hisat2.{lib}_q{qtrimvals}_nochlamy.{ref_params}.mapped3.bam"),
+        bammappedmerge=temp("annotation/{ref_params}/mapping/hisat2.{lib}_q{qtrimvals}_nochlamy.{ref_params}.mapped.merge.bam"),
+        readsf="data/reads-rnaseq-genome-mapped/{lib}_q{qtrimvals}_nochlamy.{ref_params}.R1.fastq.gz",
+        readsr="data/reads-rnaseq-genome-mapped/{lib}_q{qtrimvals}_nochlamy.{ref_params}.R2.fastq.gz",
+        readsu="data/reads-rnaseq-genome-mapped/{lib}_q{qtrimvals}_nochlamy.{ref_params}.U.fastq.gz"
+    log: "logs/hisat_rnaseq_mapped_reads_to_fastq.{lib}_q{qtrimvals}_nochlamy.{ref_params}.log"
     conda: "envs/bowtie2.yml"
     threads: 12 # vmem 1G, time 2:0:0, threads 12
     params:
-        tmpprefix="/tmp/kbseah/{lib}_q{qtrimvals}_nochlamy.{assembler}_{sp}_q{qtrimvals}/bam2fastq_",
-        tmpdir="/tmp/kbseah/{lib}_q{qtrimvals}_nochlamy.{assembler}_{sp}_q{qtrimvals}"
+        tmpprefix="/tmp/kbseah/{lib}_q{qtrimvals}_nochlamy.{ref_params}/bam2fastq_",
+        tmpdir="/tmp/kbseah/{lib}_q{qtrimvals}_nochlamy.{ref_params}"
     shell:
         "samtools view -@ 11 -bh -F 4 -f 8 -o {output.bamfwdmapped} {input.sortbam};" # Reads with fwd segment mapped but not rev
         "samtools view -@ 11 -bh -F 8 -f 4 -o {output.bamrevmapped} {input.sortbam};" # Reads with rev segment mapped but not fwd

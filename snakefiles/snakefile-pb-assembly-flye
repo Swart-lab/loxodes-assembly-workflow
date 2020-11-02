@@ -4,8 +4,10 @@ rule flye_comb_ccs:
         lambda wildcards: expand("data/pb/{lib}_HIFI.fastq.gz",lib=config['libraries_by_sp'][wildcards.sp]['pb-ccs'])
     output:
         assembly="assembly/flye-comb_{sp}/assembly.fasta",
-        scaffolds="assembly/flye-comb_{sp}/scaffolds.fasta", # alias for consistency
-        assembly_info="assembly/flye-comb_{sp}/assembly_info.txt"
+        gfa="assembly/flye-comb_{sp}/assembly_graph.gfa",
+        gv="assembly/flye-comb_{sp}/assembly_graph.gv",
+        assembly_info="assembly/flye-comb_{sp}/assembly_info.txt",
+        scaffolds="assembly/flye-comb_{sp}/scaffolds.fasta" # alias for consistency
     threads: 16
     conda: "envs/flye.yml"
     params:
@@ -14,6 +16,23 @@ rule flye_comb_ccs:
     shell:
         "flye --threads {threads} --pacbio-hifi -o {params.prefix} {input} &> {log};"
         "ln -sr {output.assembly} {output.scaffolds}" # -r relative link, else rule breaks
+
+rule link_flye_assem_output:
+    input:
+        assembly="assembly/flye-comb_{sp}/assembly.fasta",
+        gfa="assembly/flye-comb_{sp}/assembly_graph.gfa",
+        gv="assembly/flye-comb_{sp}/assembly_graph.gv",
+        assembly_info="assembly/flye-comb_{sp}/assembly_info.txt"
+    output:
+        assembly="assembly/latest/flye-comb_{sp}.assembly.fasta",
+        gfa="assembly/latest/flye-comb_{sp}.assembly_graph.gfa",
+        gv="assembly/latest/flye-comb_{sp}.assembly_graph.gv",
+        assembly_info="assembly/latest/flye-comb_{sp}.assembly_info.txt"
+    shell:
+        "ln -sr {input.assembly} {output.assembly};"
+        "ln -sr {input.gfa} {output.gfa};"
+        "ln -sr {input.gv} {output.gv};"
+        "ln -sr {input.assembly_info} {output.assembly_info}"
 
 rule gbtquick_flye_comb:
     input:

@@ -10,22 +10,16 @@ include: "snakefiles/snakefile-reads-rnaseq-assembly"
 
 rule annotation_flye_comb:
     input:
-        expand("annotation/flye-comb_{sp}/flye-comb_{sp}.gbtquick.blobplot.png",
-                sp=['LmagMAC','LmagMIC']),
-        expand("annotation/flye-comb_{sp}/flye-comb_{sp}.gbtquick.covstats.tsv",
-                sp=['LmagMAC','LmagMIC']),
+        expand("annotation/flye-comb_{sp}/flye-comb_{sp}.{output_type}",
+                sp=['LmagMAC','LmagMIC'],
+                output_type=['gbtquick.blobplot.png','gbtquick.covstats.tsv']),
 
 rule annotation_megahit_comb:
     input:
-        expand("annotation/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}.bin_cds50_gc40.fasta",
+        expand("annotation/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}.{output_type}",
                sp=config['species'],
-               qtrimvals=[28]),
-        expand("annotation/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}.gbtquick.blobplot.png",
-               sp=config['species'],
-               qtrimvals=[28]),
-        expand("annotation/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}.gbtquick.covstats.tsv",
-               sp=config['species'],
-               qtrimvals=[28]),
+               qtrimvals=[28],
+               output_type=['bin_cds50_gc40.fasta','gbtquick.blobplot.png','gbtquick.covstats.tsv']),
         expand("annotation/megahit-comb_{sp}_q{qtrimvals}/megahit-comb_{sp}_q{qtrimvals}.barrnap.{kingdom}.gff",
                sp=config['species'],
                qtrimvals=[28],
@@ -34,15 +28,10 @@ rule annotation_megahit_comb:
 rule annotation_spades_comb:
     # Annotate each combined metagenomic assembly
     input:
-        expand("annotation/spades-comb_{sp}_q{qtrimvals}/spades-comb_{sp}_q{qtrimvals}.bin_cds50_gc40.fasta",
+        expand("annotation/spades-comb_{sp}_q{qtrimvals}/spades-comb_{sp}_q{qtrimvals}.{output_type}",
                sp=config['species'],
-               qtrimvals=[28]),
-        expand("annotation/spades-comb_{sp}_q{qtrimvals}/spades-comb_{sp}_q{qtrimvals}.gbtquick.blobplot.png",
-               sp=config['species'],
-               qtrimvals=[28]),
-        expand("annotation/spades-comb_{sp}_q{qtrimvals}/spades-comb_{sp}_q{qtrimvals}.gbtquick.covstats.tsv",
-               sp=config['species'],
-               qtrimvals=[28]),
+               qtrimvals=[28],
+               output_type=['bin_cds50_gc40.fasta','gbtquick.blobplot.png','gbtquick.covstats.tsv']),
         expand("annotation/spades-comb_{sp}_q{qtrimvals}/spades-comb_{sp}_q{qtrimvals}.barrnap.{kingdom}.gff",
                sp=config['species'],
                qtrimvals=[28],
@@ -51,35 +40,58 @@ rule annotation_spades_comb:
 rule annotation_spades_sc:
     # Annotate each single-cell MDA assembly
     input:
-        expand("annotation/spades-sc_{lib}_q{qtrimvals}/spades-sc_{lib}_q{qtrimvals}.gbtquick.blobplot.png",
+        expand("annotation/spades-sc_{lib}_q{qtrimvals}/spades-sc_{lib}_q{qtrimvals}.{output_type}",
                lib=config['libraries_sc'],
-               qtrimvals=config['qtrimvals']),
-        expand("annotation/spades-sc_{lib}_q{qtrimvals}/spades-sc_{lib}_q{qtrimvals}.gbtquick.covstats.tsv",
-               lib=config['libraries_sc'],
-               qtrimvals=config['qtrimvals']),
-        expand("annotation/spades-sc_{lib}_q{qtrimvals}/spades-sc_{lib}_q{qtrimvals}.bin_cds50_gc40.fasta",
-               lib=config['libraries_sc'],
-               qtrimvals=config['qtrimvals']),
+               qtrimvals=config['qtrimvals'],
+               output_type=['gbtquick.blobplot.png','gbtquick.covstats.tsv','bin_cds50_gc40.fasta']),
+
+rule latest_assemblies:
+    # symlink latest versions of all the target assemblies
+    input:
+        # single-cell assemblies
+        expand("assembly/latest/spades-sc_{lib_sc}_q{qtrimvals}.{output_type}",
+               lib_sc=config["libraries_sc"],
+               qtrimvals=config["qtrimvals"],
+               output_type=['scaffolds.fasta','assembly_graph.fastg']),
+        # Combined assemblies of all bulk metagenomic libraries per species
+        expand("assembly/latest/{assembler}-comb_{sp}_q{qtrimvals}.{output_type}",
+               assembler=['spades','megahit'],
+               sp=config['species'],
+               qtrimvals=[28],
+               output_type=['scaffolds.fasta','assembly_graph.fastg']),
+        # Combined assemblies of PacBio libraries per species
+        expand("assembly/latest/flye-comb_{sp}.{output_type}",
+                sp=['LmagMAC','LmagMIC'],
+                output_type=['assembly.fasta','assembly_graph.gfa','assembly_graph.gv','assembly_info.txt']),
+        # Combined assemblies of RNAseq libraries, combined by experiment
+        expand("assembly/latest/trinity_rnaseq_{experiment}_nochlamy_comb.{output_type}",
+               experiment=["exp146"],
+               output_type=['Trinity.fasta','Trinity.fasta.gene_trans_map']),
+        expand("assembly/latest/trinity_rnaseq_{experiment}_nochlamy_comb.mapped_{ref_params}.{output_type}",
+                experiment=["exp146"],
+                ref_params=['spades-comb_LmagMAC_q28'],
+                output_type=['Trinity.fasta','Trinity.fasta.gene_trans_map']),
 
 rule assembly_rnaseq:
     input:
         # Combined assemblies of RNAseq libraries, combined by experiment
         expand("assembly/trinity_rnaseq_{experiment}_nochlamy_comb/trinity_outdir/Trinity.fasta",
                experiment=["exp146"]),
-        expand("assembly/trinity_rnaseq_{experiment}_nochlamy_comb.mapped_{assembler}_{sp}_q{qtrimvals}/trinity_outdir/Trinity.fasta",
+        expand("assembly/trinity_rnaseq_{experiment}_nochlamy_comb.mapped_{ref_params}/trinity_outdir/Trinity.fasta",
                 experiment=["exp146"],
-                assembler=["spades-comb"],
-                sp=["LmagMAC"],
-                qtrimvals=[28])
+                ref_params=['spades-comb_LmagMAC_q28','flye-comb_LmagMAC']),
+        # expand("assembly/trinity_rnaseq_{experiment}_nochlamy_comb.gg_{ref_params}/trinity_outdir/Trinity.fasta",
+        #         experiment=["exp146"],
+        #         ref_params=['flye-comb_LmagMAC']),
 
-rule assembly_illumina_sc:
+rule assembly_illumina_sc: #todel
     input:
         # Individual assemblies of each single-cell MDA library
         expand("assembly/spades-sc_{lib_sc}_q{qtrimvals}/scaffolds.fasta",
                lib_sc=config["libraries_sc"],
                qtrimvals=config["qtrimvals"]),
 
-rule assembly_illumina_comb:
+rule assembly_illumina_comb: # todel
     input:
         # Combined assemblies of all bulk metagenomic libraries per species
         expand("assembly/{assembler}-comb_{sp}_q{qtrimvals}/scaffolds.fasta",
@@ -91,7 +103,7 @@ rule assembly_illumina_comb:
                sp=config['species'],
                qtrimvals=[28])
 
-rule assembly_flye_comb:
+rule assembly_flye_comb: # todel
     input:
         expand("assembly/flye-comb_{sp}/assembly.fasta",
                 sp=['LmagMAC','LmagMIC'])
