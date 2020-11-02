@@ -1,10 +1,10 @@
 include: "snakefile-reads-assembly-spades"
 include: "snakefile-reads-assembly-megahit"
-include: "snakefile-reads-assembly-flye"
 include: "snakefile-reads-assembly-spades-qc"
 include: "snakefile-reads-assembly-megahit-qc"
 include: "snakefile-reads-assembly-qc"
 include: "snakefile-reads-preprocess-qc"
+include: "snakefile-pb-assembly-flye"
 include: "snakefile-reads-rnaseq-preprocess-qc"
 include: "snakefile-reads-rnaseq-assembly"
 
