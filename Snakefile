@@ -1,12 +1,12 @@
-include: "snakefile-reads-assembly-spades"
-include: "snakefile-reads-assembly-megahit"
-include: "snakefile-reads-assembly-spades-qc"
-include: "snakefile-reads-assembly-megahit-qc"
-include: "snakefile-reads-assembly-qc"
-include: "snakefile-reads-preprocess-qc"
-include: "snakefile-pb-assembly-flye"
-include: "snakefile-reads-rnaseq-preprocess-qc"
-include: "snakefile-reads-rnaseq-assembly"
+include: "snakefiles/snakefile-reads-assembly-spades"
+include: "snakefiles/snakefile-reads-assembly-megahit"
+include: "snakefiles/snakefile-reads-assembly-spades-qc"
+include: "snakefiles/snakefile-reads-assembly-megahit-qc"
+include: "snakefiles/snakefile-reads-assembly-qc"
+include: "snakefiles/snakefile-reads-preprocess-qc"
+include: "snakefiles/snakefile-pb-assembly-flye"
+include: "snakefiles/snakefile-reads-rnaseq-preprocess-qc"
+include: "snakefiles/snakefile-reads-rnaseq-assembly"
 
 rule annotation_flye_comb:
     input:
