@@ -1,7 +1,8 @@
 # Snakemake workflow for Loxodes genomics project
 
 Snakefiles and Conda environment definition files for the Loxodes genomics 
-project.
+project. The top level Readme for this project is `README_root.md`, which
+documents the folder structure of the main storage project folder.
 
 These files should reside in a subfolder `workflow` of the main storage project. 
 The Snakemake pipeline is called from there, so the paths in Snakemake rules are 
