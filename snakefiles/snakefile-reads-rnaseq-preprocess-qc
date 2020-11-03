@@ -103,6 +103,7 @@ rule hisat_rnaseq_map_to_genome:
         sortbam="annotation/{ref_params}/mapping/hisat2.{lib}_q{qtrimvals}_nochlamy.{ref_params}.sort.bam",
         metfile="annotation/{ref_params}/mapping/hisat2.{lib}_q{qtrimvals}_nochlamy.{ref_params}.met"
     log: "logs/hisat_rnaseq_map_to_genome.hisat2.{lib}_q{qtrimvals}_nochlamy.{ref_params}.log"
+    conda: "envs/bowtie2.yml"
     params:
         prefix="annotation/{ref_params}/mapping/{ref_params}",
         hisatpath="/ebio/abt2_projects/ag-swart-loxodes/opt/hisat2-2.0.0-beta/hisat2",

@@ -74,12 +74,23 @@ rule trinity_rnaseq_nochlamy_mapped_comb:
         # where unexpected parameters are introduced into the commands
         "Trinity --seqType fq --max_memory 64G --CPU {threads} --SS_lib_type {params.sslibtype} --samples_file {input.samplesfile} --output {params.prefix} --grid_exec \"{params.hpcgridrunnerpath} -G {output.hpcgridrunnerconfig} -c\";"
 
-"""
+rule combine_sort_hisat_mappings:
+    # Combine and sort all per-library BAMs of hisat mappings for a single RNAseq experiment
+    input:
+        bams=lambda wildcards: expand("annotation/{ref_params}/mapping/hisat2.{lib}_q28_nochlamy.{ref_params}.sort.bam",lib=config["experiments_rnaseq"][wildcards.experiment]["libraries"], ref_params=wildcards.ref_params)
+    output:
+        combbam=temp("annotation/{ref_params}/mapping/hisat2-comb.{experiment}_q28_nochlamy.{ref_params}.comb.bam"),
+        sortbam="annotation/{ref_params}/mapping/hisat2-comb.{experiment}_q28_nochlamy.{ref_params}.sort.bam"
+    threads: 16
+    conda: "envs/bowtie2.yml"
+    shell:
+        "samtools view -b -@ {threads} -o {output.combbam} {input.bams};"
+        "samtools sort -@ {threads} -o {output.sortbam} {output.combbam}"
+
 rule trinity_rnaseq_nochlamy_mapped_comb_gg:
     # genome-guided Trinity assembly of RNAseq reads mapped to a reference genome
     input:
-        # TODO combine and sort bam files for all libraries assigned to this experiment
-        sortbam="annotation/{ref_params}/mapping/hisat2.{lib}_q28_nochlamy.{ref_params}.sort.bam"
+        sortbam="annotation/{ref_params}/mapping/hisat2-comb.{experiment}_q28_nochlamy.{ref_params}.sort.bam"
     threads: 16
     conda: "envs/trinity.yml"
     params:
@@ -105,4 +116,3 @@ rule trinity_rnaseq_nochlamy_mapped_comb_gg:
         # otherwise there is a weird bug in the file `recursive_trinity.cmds`
         # where unexpected parameters are introduced into the commands
         "Trinity --max_memory 64G --CPU {threads} --SS_lib_type {params.sslibtype} --genome_guided_bam {input.sortbam} --genome_guided_max_intron 200 --output {params.prefix} --grid_exec \"{params.hpcgridrunnerpath} -G {output.hpcgridrunnerconfig} -c\";"
-"""

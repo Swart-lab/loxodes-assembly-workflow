@@ -77,12 +77,13 @@ rule assembly_rnaseq:
         # Combined assemblies of RNAseq libraries, combined by experiment
         expand("assembly/trinity_rnaseq_{experiment}_nochlamy_comb/trinity_outdir/Trinity.fasta",
                experiment=["exp146"]),
-        expand("assembly/trinity_rnaseq_{experiment}_nochlamy_comb.mapped_{ref_params}/trinity_outdir/Trinity.fasta",
-                experiment=["exp146"],
-                ref_params=['spades-comb_LmagMAC_q28','flye-comb_LmagMAC']),
-        # expand("assembly/trinity_rnaseq_{experiment}_nochlamy_comb.gg_{ref_params}/trinity_outdir/Trinity.fasta",
+        # expand("assembly/trinity_rnaseq_{experiment}_nochlamy_comb.mapped_{ref_params}/trinity_outdir/Trinity.fasta",
         #         experiment=["exp146"],
-        #         ref_params=['flye-comb_LmagMAC']),
+        #         ref_params=['spades-comb_LmagMAC_q28']),
+        # Genome-guided assembly of RNAseq libraries, mapped to reference genome
+        expand("assembly/trinity_rnaseq_{experiment}_nochlamy_comb.gg_{ref_params}/trinity_outdir/Trinity.fasta",
+                experiment=["exp146"],
+                ref_params=['flye-comb_LmagMAC']),
 
 rule assembly_illumina_sc: #todel
     input:
