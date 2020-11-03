@@ -4,5 +4,5 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - trinity=2.8.5=h8b12597_2
-  - salmon=0.14.2=ha0cc327_0
+  - trinity=2.11.0
+  - salmon
