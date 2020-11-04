@@ -97,24 +97,12 @@ rule trinity_rnaseq_nochlamy_mapped_comb_gg:
     params:
         sslibtype="RF",
         prefix="assembly/trinity_rnaseq_{experiment}_nochlamy_comb.gg_{ref_params}/trinity_outdir",
-        # Using full paths for the following parameters because they will be
-        # passed to HpcGridRunner. Use HpcGridRunner version commit 6a44b7b
-        hpcgridrunnerpath="/ebio/abt2_projects/ag-swart-loxodes/opt/HpcGridRunner/hpc_cmds_GridRunner.pl",
-        hpcgridrunnerconfigtemplate="/ebio/abt2_projects/ag-swart-loxodes/workflow/hpcgridrunner_sge_conf_trinity_template"
     log: "logs/trinity_rnaseq_nochlamy_mapped_comb_gg.{experiment}_{ref_params}.log"
     output:
         assembly="assembly/trinity_rnaseq_{experiment}_nochlamy_comb.gg_{ref_params}/trinity_outdir/Trinity.fasta",
-        gene_trans_map="assembly/trinity_rnaseq_{experiment}_nochlamy_comb.gg_{ref_params}/trinity_outdir/Trinity.fasta.gene_trans_map",
-        hpcgridrunnerconfig="/ebio/abt2_projects/ag-swart-loxodes/assembly/trinity_rnaseq_{experiment}_nochlamy_comb.gg_{ref_params}/hpcgridrunner_sge_conf_trinity"
+        gene_trans_map="assembly/trinity_rnaseq_{experiment}_nochlamy_comb.gg_{ref_params}/trinity_outdir/Trinity.fasta.gene_trans_map"
     shell:
-        # Use commas in the sed regex because CONDA_PREFIX contains slashes
-        # This command puts the current Conda environment (for running Trinity) 
-        # into the config file for HpcGridRunner. This is because the current
-        # conda environment is not automatically 'inherited' by HpcGridRunner 
-        # array jobs.
-        "sed \"s,PLACEHOLDER,$CONDA_PREFIX,\" {params.hpcgridrunnerconfigtemplate} > {output.hpcgridrunnerconfig};"
-        # For the Trinity command, it is important to have --grid_exec as last 
-        # parameter and to avoid using = to link option and value in the params.
-        # otherwise there is a weird bug in the file `recursive_trinity.cmds`
-        # where unexpected parameters are introduced into the commands
-        "Trinity --max_memory 64G --CPU {threads} --SS_lib_type {params.sslibtype} --genome_guided_bam {input.sortbam} --genome_guided_max_intron 200 --output {params.prefix} --grid_exec \"{params.hpcgridrunnerpath} -G {output.hpcgridrunnerconfig} -c\" &> {log};"
+        "Trinity --max_memory 64G --CPU {threads} --SS_lib_type {params.sslibtype} --genome_guided_bam {input.sortbam} --genome_guided_max_intron 200 --output {params.prefix} &> {log};"
+        # genome guided mode produces output with prefix Trinity-GG instead of Trinity
+        "ln -sr {params.prefix}/Trinity-GG.fasta {output.assembly};"
+        "ln -sr {params.prefix}/Trinity-GG.fasta.gene_trans_map {output.gene_trans_map};"

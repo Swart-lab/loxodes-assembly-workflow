@@ -67,9 +67,13 @@ rule latest_assemblies:
         expand("assembly/latest/trinity_rnaseq_{experiment}_nochlamy_comb.{output_type}",
                experiment=["exp146"],
                output_type=['Trinity.fasta','Trinity.fasta.gene_trans_map']),
-        expand("assembly/latest/trinity_rnaseq_{experiment}_nochlamy_comb.mapped_{ref_params}.{output_type}",
+        # expand("assembly/latest/trinity_rnaseq_{experiment}_nochlamy_comb.mapped_{ref_params}.{output_type}",
+        #         experiment=["exp146"],
+        #         ref_params=['spades-comb_LmagMAC_q28'],
+        #         output_type=['Trinity.fasta','Trinity.fasta.gene_trans_map']),
+        expand("assembly/latest/trinity_rnaseq_{experiment}_nochlamy_comb.gg_{ref_params}.{output_type}",
                 experiment=["exp146"],
-                ref_params=['spades-comb_LmagMAC_q28'],
+                ref_params=['flye-comb_LmagMAC'],
                 output_type=['Trinity.fasta','Trinity.fasta.gene_trans_map']),
 
 rule assembly_rnaseq:
