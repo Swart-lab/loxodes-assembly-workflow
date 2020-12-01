@@ -61,3 +61,15 @@ rule phyloflash:
     shell:
         "phyloFlash.pl -lib {wildcards.lib} -readlength 150 -read1 {input.fwd} -read2 {input.rev} -CPUs {threads} -almosteverything -dbhome {params.db} 2> {log};"
         "mv {wildcards.lib}.phyloFlash* qc/phyloFlash/;"
+
+rule index_bam:
+    # Index bamfile
+    input:
+        bam="{prefix}.bam"
+    output:
+        bai="{prefix}.bam.bai"
+    threads: 4
+    log: "logs/index_bam.{prefix}.log"
+    conda: "envs/bowtie2.yml"
+    shell:
+        "samtools index -b -@ {threads} {input.bam} &> {log}"
