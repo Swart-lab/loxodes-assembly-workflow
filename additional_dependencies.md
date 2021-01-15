@@ -51,3 +51,51 @@ wget http://downloads.sourceforge.net/project/parafly/parafly-r2013-01-21.tgz
 ```
 git clone git@github.com:Swart-lab/gbtquick.git
 ```
+
+# winnowmap
+```
+git clone https://github.com/marbl/Winnowmap.git
+git checkout v2.0
+```
+
+# harp
+```
+git clone https://bitbucket.org/dkessner/harp.git
+```
+
+# pbsim
+
+Original repository on Google Code, which has been deprecated. This is a mirror
+on Github. NB: superseded by pbsim2
+
+```
+git clone git@github.com:pfaucon/PBSIM-PacBio-Simulator.git
+```
+
+# pbsim2
+
+Updated version of pbsim from original authors. Latest commit e71f789 nominally
+v2.0.1
+
+```
+git clone git@github.com:yukiteruono/pbsim2.git
+```
+
+
+# pogigwasc
+
+Masters project by David Vetter, git repo, latest commit 85731dc. Follow build
+instructions with maven
+
+```
+git clone git@github.com:Swart-lab/pogigwasc.git
+```
+
+# Apache Maven
+
+Package build manager for Java, required to compile pogigwasc
+
+```
+wget https://ftp.fau.de/apache/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
+```
+
