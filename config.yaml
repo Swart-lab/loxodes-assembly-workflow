@@ -79,6 +79,7 @@ libraries_by_sp:
       - 4615_C
     pb-ccs:
       - 4777_A
+      - 4916_A
   LmagMIC:
     illumina-bulk:
       - 4519_B
@@ -87,6 +88,7 @@ libraries_by_sp:
       - 4615_D
     pb-ccs:
       - 4777_B
+      - 4916_B
   LstrMAC:
     illumina-bulk:
       - 4519_E
@@ -422,3 +424,11 @@ pb_raw:
     # subreads:
     ccs:
       - data/pb/4777_B_HIFI.fastq.gz
+  4916_A:
+    ccs:
+      - data/pb/4916_A_HIFI.fastq.gz
+      - data/pb/4916_A_4777_A3_run538_CCS.fastq.gz
+  4916_B:
+    ccs:
+      - data/pb/4916_B_HIFI.fastq.gz
+      - data/pb/4916_B_4777_B3_run540_CCS.fastq.gz
