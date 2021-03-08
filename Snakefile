@@ -13,6 +13,8 @@ rule annotation_flye_comb:
         expand("annotation/flye-comb_{sp}/flye-comb_{sp}.{output_type}",
                 sp=['LmagMAC','LmagMIC'],
                 output_type=['gbtquick.blobplot.png','gbtquick.covstats.tsv']),
+        expand("annotation/flye-comb_{spref}/mapping/minimap2.{spmap}_pb-ccs_vs_flye-comb_{spref}.bam",
+                spref=['LmagMAC','LmagMIC'], spmap=['LmagMAC','LmagMIC']),
 
 rule annotation_megahit_comb:
     input:
