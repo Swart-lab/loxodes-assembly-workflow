@@ -99,3 +99,11 @@ Package build manager for Java, required to compile pogigwasc
 wget https://ftp.fau.de/apache/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
 ```
 
+
+# pb-assembly
+
+We want the `get_asm_stats.py` script to parse Falcon assembly
+
+```
+git clone https://github.com/PacificBiosciences/pb-assembly.git
+```
