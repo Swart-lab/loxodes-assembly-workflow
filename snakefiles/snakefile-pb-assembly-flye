@@ -70,19 +70,18 @@ rule minimap_ccs_flye_comb:
         # not documented; see https://github.com/lh3/minimap2/issues/191
         "minimap2 --MD -t {threads} -ax asm20 {input.scaffolds} {input.reads} 2> {log.minimap} | samtools view -b --reference {input.scaffolds} > {output.bam} ;"
 
-# rule sort_minimap_ccs_flye_comb:
-#     input:
-#         sam="annotation/flye-comb_{spref}/mapping/minimap2.{spmap}_pb-ccs_vs_flye-comb_{spref}.sam",
-#         scaffolds="assembly/flye-comb_{spref}/assembly.fasta"
-#     output:
-#         bam=temp("annotation/flye-comb_{spref}/mapping/minimap2.{spmap}_pb-ccs_vs_flye-comb_{spref}.bam"),
-#         sortbam="annotation/flye-comb_{spref}/mapping/minimap2.{spmap}_pb-ccs_vs_flye-comb_{spref}.sort.bam"
-#     conda: "envs/minimap2.yml"
-#     threads: 8
-#     log:
-#         view="logs/sort_minimap_ccs_flye_comb.{spmap}.{spref}.view.log",
-#         sort="logs/sort_minimap_ccs_flye_comb.{spmap}.{spref}.sort.log",
-#         index="logs/sort_minimap_ccs_flye_comb.{spmap}.{spref}.index.log"
-#     shell:
-#         "samtools view -b --threads {threads} --reference {input.scaffolds} -o {output.bam} {input.sam} 2> {log.view};"
-#         "samtools sort --threads {threads} --reference {input.scaffolds} -o {output.sortbam} {output.bam} 2> {log.sort};"
+rule sort_minimap_ccs_flye_comb:
+    input:
+        scaffolds="assembly/flye-comb_{spref}/assembly.fasta",
+        bam="annotation/flye-comb_{spref}/mapping/minimap2.{spmap}_pb-ccs_vs_flye-comb_{spref}.bam"
+    output:
+        sortbam="annotation/flye-comb_{spref}/mapping/minimap2.{spmap}_pb-ccs_vs_flye-comb_{spref}.sort.bam",
+        index="annotation/flye-comb_{spref}/mapping/minimap2.{spmap}_pb-ccs_vs_flye-comb_{spref}.sort.bam.bai"
+    conda: "envs/minimap2.yml"
+    threads: 8
+    log:
+        sort="logs/sort_minimap_ccs_flye_comb.{spmap}.{spref}.sort.log",
+        index="logs/sort_minimap_ccs_flye_comb.{spmap}.{spref}.index.log"
+    shell:
+        "samtools sort --threads {threads} --reference {input.scaffolds} -o {output.sortbam} {input.bam} 2> {log.sort};"
+        "samtools index {output.sortbam} 2> {log.index};"
