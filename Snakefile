@@ -13,8 +13,10 @@ rule annotation_flye_comb:
         expand("annotation/flye-comb_{sp}/flye-comb_{sp}.{output_type}",
                 sp=['LmagMAC','LmagMIC'],
                 output_type=['gbtquick.blobplot.png','gbtquick.covstats.tsv']),
-        expand("annotation/flye-comb_{spref}/mapping/minimap2.{spmap}_pb-ccs_vs_flye-comb_{spref}.bam",
+        expand("annotation/flye-comb_{spref}/mapping/minimap2.{spmap}_pb-ccs_vs_flye-comb_{spref}.sort.bam",
                 spref=['LmagMAC','LmagMIC'], spmap=['LmagMAC','LmagMIC']),
+        expand("annotation/flye-comb_{spref}/mapping/hisat2.{lib}_q28_nochlamy.flye-comb_{spref}.sort.bam.bai",
+                spref=['LmagMAC','LmagMIC'],lib=config["libraries_rnaseq"]),
 
 rule annotation_megahit_comb:
     input:
