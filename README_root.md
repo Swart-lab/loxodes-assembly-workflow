@@ -1,11 +1,13 @@
-# Loxodes genomics project
+Loxodes genomics project
+========================
 
 This folder contains genome sequencing and assembly data for _Loxodes_ ciliates.
 
 Each subfolder should have a Readme describing its contents. Code and
 documentation subfolders are tracked by git.
 
-## Project folder contents
+Project folder contents
+-----------------------
 
 ### Git repositories
  * `workflow/` - Snakemake pipelines for preprocessing and QC of data
@@ -13,7 +15,10 @@ documentation subfolders are tracked by git.
  * `doc/` - Documentation including metadata for read data
 
 ### Data and software
- * `data/` - Primary raw data, e.g. sequence read libraries
+ * `data/` - Primary raw data, e.g. sequence read libraries. Most of the large
+             data files are symlinked from the `ag-swart-loxodes-raw` storage
+             project. Folder also contains intermediate processed files (e.g.
+             trimmed or reformatted reads); such folders are not backed up.
  * `assembly/` - Genome and transcriptome assemblies
  * `db/` - Databases used for analysis
  * `envs/` - Conda environments, including those for Snakemake pipeline
@@ -31,7 +36,8 @@ documentation subfolders are tracked by git.
  * `logs/` - Log files from preprocessing and QC steps
  * `logs_SGE/` - Log files from SGE
 
-## Using Snakemake workflow
+Using Snakemake workflow
+------------------------
 
 The Snakemake workflow is primarily used to manage preprocessing tasks, e.g.
 read QC and trimming. To call the workflow you will need to specify the relevant
@@ -79,7 +85,8 @@ RULENAME
 ```
 
 
-## Contact
+Contact
+-------
 
  * [Brandon Seah](mailto:kb.seah@tuebingen.mpg.de)
  * [Estienne Swart](mailto:estienne.swart@tuebingen.mpg.de)
