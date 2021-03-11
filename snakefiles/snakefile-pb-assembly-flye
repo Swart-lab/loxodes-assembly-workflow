@@ -1,3 +1,5 @@
+import os.path
+
 def get_pb_ccs_by_sp(sp):
     outfiles = []
     for lib in expand(config['libraries_by_sp'][sp]['pb-ccs']):
@@ -55,33 +57,74 @@ rule gbtquick_flye_comb:
     shell:
         "opt/gbtquick/gbtquick.py -a flye -f {input.scaffolds} -i {input.assembly_info} -o {params.prefix} --plot --plot_fmt png --prodigal_gff {input.prodigal_gff} &> {log}"
 
-rule minimap_ccs_flye_comb:
+# Common to both Falcon and Flye assemblies
+
+rule minimap_pb_ccs_assembly:
     input:
-        scaffolds="assembly/flye-comb_{spref}/assembly.fasta",
+        scaffolds="assembly/{assembler}-comb_{spref}/scaffolds.fasta",
         reads=lambda wildcards: get_pb_ccs_by_sp(wildcards.spmap)
     conda: "envs/minimap2.yml"
     log:
-        minimap="logs/minimap_ccs_flye_comb.{spmap}.{spref}.minimap2.log"
+        minimap="logs/minimap_ccs_{assembler}-comb.{spmap}.{spref}.minimap2.log"
     threads: 24
     output:
-        bam="annotation/flye-comb_{spref}/mapping/minimap2.{spmap}_pb-ccs_vs_flye-comb_{spref}.bam"
+        bam="annotation/{assembler}-comb_{spref}/mapping/minimap2.{spmap}_pb-ccs_vs_{assembler}-comb_{spref}.bam"
     shell:
         # multiple input reads can be supplied to minimap
         # not documented; see https://github.com/lh3/minimap2/issues/191
         "minimap2 --MD -t {threads} -ax asm20 {input.scaffolds} {input.reads} 2> {log.minimap} | samtools view -b --reference {input.scaffolds} > {output.bam} ;"
 
-rule sort_minimap_ccs_flye_comb:
+rule sort_minimap_pb_ccs_assembly:
     input:
-        scaffolds="assembly/flye-comb_{spref}/assembly.fasta",
-        bam="annotation/flye-comb_{spref}/mapping/minimap2.{spmap}_pb-ccs_vs_flye-comb_{spref}.bam"
+        scaffolds="assembly/{assembler}-comb_{spref}/scaffolds.fasta",
+        bam="annotation/{assembler}-comb_{spref}/mapping/minimap2.{spmap}_pb-ccs_vs_{assembler}-comb_{spref}.bam"
     output:
-        sortbam="annotation/flye-comb_{spref}/mapping/minimap2.{spmap}_pb-ccs_vs_flye-comb_{spref}.sort.bam",
-        index="annotation/flye-comb_{spref}/mapping/minimap2.{spmap}_pb-ccs_vs_flye-comb_{spref}.sort.bam.bai"
+        sortbam="annotation/{assembler}-comb_{spref}/mapping/minimap2.{spmap}_pb-ccs_vs_{assembler}-comb_{spref}.sort.bam",
+        index="annotation/{assembler}-comb_{spref}/mapping/minimap2.{spmap}_pb-ccs_vs_{assembler}-comb_{spref}.sort.bam.bai"
     conda: "envs/minimap2.yml"
     threads: 8
     log:
-        sort="logs/sort_minimap_ccs_flye_comb.{spmap}.{spref}.sort.log",
-        index="logs/sort_minimap_ccs_flye_comb.{spmap}.{spref}.index.log"
+        sort="logs/sort_minimap_ccs_{assembler}-comb.{spmap}.{spref}.sort.log",
+        index="logs/sort_minimap_ccs_{assembler}-comb.{spmap}.{spref}.index.log"
     shell:
         "samtools sort --threads {threads} --reference {input.scaffolds} -o {output.sortbam} {input.bam} 2> {log.sort};"
         "samtools index {output.sortbam} 2> {log.index};"
+
+# Prepare files for Falcon assembly
+
+rule combine_pb_fq:
+    # Combine reads from multiple runs belonging to the same libraries
+    input:
+        lambda wildcards: config['pb_raw'][wildcards.lib]['ccs']
+    output:
+        "data/pb-combine/{lib}.fastq.gz",
+    conda: "envs/bbmap.yml"
+    threads: 8
+    params:
+        # Allocate at least one thread to pigz, otherwise one fewer than total
+        pigzthreads=lambda wildcards, threads: threads - 1 if (threads > 1) else 1
+    shell:
+        "gzip -cd {input} | pigz -p {params.pigzthreads} -c > {output};"
+
+rule reformat_fastq_fasta:
+    # Reformat to Fasta format, needed by Falcon
+    input: "data/pb-combine/{lib}.fastq.gz"
+    output: "data/pb-combine/{lib}.fasta"
+    threads: 8
+    conda: "envs/bbmap.yml"
+    shell:
+        "reformat.sh threads={threads} in={input} out={output}"
+
+rule make_fofn:
+    # Make FOFN file required by Falcon
+    output: "assembly/falcon-comb_{sp}/falcon-comb_{sp}.fofn"
+    input:
+        lambda wildcards: expand("data/pb-combine/{lib}.fasta", lib=config['libraries_by_sp'][wildcards.sp]['pb-ccs'])
+    run:
+        with open(output[0], 'w') as fh:
+            for i in input:
+                fh.write(str(os.path.abspath(i)))
+                fh.write("\n")
+
+# Actual Falcon assembly is not under Snakemake workflow control because 
+# there are several manual intervention steps required

@@ -8,6 +8,17 @@ include: "snakefiles/snakefile-pb-assembly-flye"
 include: "snakefiles/snakefile-reads-rnaseq-preprocess-qc"
 include: "snakefiles/snakefile-reads-rnaseq-assembly"
 
+
+rule annotation_falcon_comb:
+    # Falcon assembly step not under snakemake control because manual interventions required
+    input:
+        # Falcon reference scaffold is step 2 p_ctg polished by Racon
+        # TODO: put minimap mapping step here too
+        expand("annotation/falcon-comb_{spref}/mapping/minimap2.{spmap}_pb-ccs_vs_falcon-comb_{spref}.sort.bam",
+                spref=['LmagMAC','LmagMIC'], spmap=['LmagMAC','LmagMIC']),
+        expand("annotation/falcon-comb_{spref}/mapping/hisat2.{lib}_q28_nochlamy.falcon-comb_{spref}.sort.bam.bai",
+                spref=['LmagMAC','LmagMIC'],lib=config["libraries_rnaseq"]),
+
 rule annotation_flye_comb:
     input:
         expand("annotation/flye-comb_{sp}/flye-comb_{sp}.{output_type}",
@@ -116,6 +127,11 @@ rule assembly_flye_comb: # todel
     input:
         expand("assembly/flye-comb_{sp}/assembly.fasta",
                 sp=['LmagMAC','LmagMIC'])
+
+rule prepare_falcon_assembly_files:
+    input:
+        expand("assembly/falcon-comb_{sp}/falcon-comb_{sp}.fofn", sp=['LmagMAC','LmagMIC'])
+
 
 rule qc:
     input:
