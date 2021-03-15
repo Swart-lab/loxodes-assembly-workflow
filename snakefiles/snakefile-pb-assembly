@@ -68,7 +68,7 @@ rule minimap_pb_ccs_assembly:
         minimap="logs/minimap_ccs_{assembler}-comb.{spmap}.{spref}.minimap2.log"
     threads: 24
     output:
-        bam="annotation/{assembler}-comb_{spref}/mapping/minimap2.{spmap}_pb-ccs_vs_{assembler}-comb_{spref}.bam"
+        bam=temp("annotation/{assembler}-comb_{spref}/mapping/minimap2.{spmap}_pb-ccs_vs_{assembler}-comb_{spref}.bam")
     shell:
         # multiple input reads can be supplied to minimap
         # not documented; see https://github.com/lh3/minimap2/issues/191
@@ -122,8 +122,8 @@ rule split_fasta_for_trf:
     # Split scaffolds into smaller chunks for running TRF
     input: "assembly/{assembler}-comb_{sp}/scaffolds.fasta"
     output:
-        expand(temp("annotation/{{assembler}}-comb_{{sp}}/trf/split_fasta/trf{num}.fa"),
-               num=[str(i).zfill(3) for i in range(100)])
+        temp(expand("annotation/{{assembler}}-comb_{{sp}}/trf/split_fasta/trf{num}.fa",
+               num=[str(i).zfill(3) for i in range(100)]))
     params:
         prefix="annotation/{assembler}-comb_{sp}/trf/split_fasta/trf"
     shell:
