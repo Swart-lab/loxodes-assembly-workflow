@@ -4,11 +4,11 @@
 # Specify additional parameters (e.g. --dryrun) and rule names 
 # after invoking this script 
 
-# snakemake conda environment should be activated
-
+# activate snakemake conda environment
+source activate ./envs/snakemake
 
 snakemake \
---cores 48 \
+--cores 24 \
 --configfile workflow/config.yaml \
 --use-conda \
 --printshellcmds \
