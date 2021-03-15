@@ -4,7 +4,7 @@ include: "snakefiles/snakefile-reads-assembly-spades-qc"
 include: "snakefiles/snakefile-reads-assembly-megahit-qc"
 include: "snakefiles/snakefile-reads-assembly-qc"
 include: "snakefiles/snakefile-reads-preprocess-qc"
-include: "snakefiles/snakefile-pb-assembly-flye"
+include: "snakefiles/snakefile-pb-assembly"
 include: "snakefiles/snakefile-reads-rnaseq-preprocess-qc"
 include: "snakefiles/snakefile-reads-rnaseq-assembly"
 
@@ -14,6 +14,9 @@ rule annotation_falcon_comb:
     input:
         # Falcon reference scaffold is step 2 p_ctg polished by Racon
         # TODO: put minimap mapping step here too
+        expand("annotation/falcon-comb_{spref}/trf/falcon-comb_{spref}.trf.ngs.dat", spref=['LmagMAC','LmagMIC']),
+        expand("annotation/falcon-comb_{spref}/falcon-comb_{spref}.gcstats", spref=['LmagMAC','LmagMIC']),
+        expand("annotation/falcon-comb_{spref}/falcon-comb_{spref}.minimap2.bedcov", spref=['LmagMAC','LmagMIC']),
         expand("annotation/falcon-comb_{spref}/mapping/minimap2.{spmap}_pb-ccs_vs_falcon-comb_{spref}.sort.bam",
                 spref=['LmagMAC','LmagMIC'], spmap=['LmagMAC','LmagMIC']),
         expand("annotation/falcon-comb_{spref}/mapping/hisat2.{lib}_q28_nochlamy.falcon-comb_{spref}.sort.bam.bai",
@@ -28,6 +31,9 @@ rule annotation_flye_comb:
                 spref=['LmagMAC','LmagMIC'], spmap=['LmagMAC','LmagMIC']),
         expand("annotation/flye-comb_{spref}/mapping/hisat2.{lib}_q28_nochlamy.flye-comb_{spref}.sort.bam.bai",
                 spref=['LmagMAC','LmagMIC'],lib=config["libraries_rnaseq"]),
+        expand("annotation/flye-comb_{spref}/flye-comb_{spref}.gcstats", spref=['LmagMAC','LmagMIC']),
+        expand("annotation/flye-comb_{spref}/flye-comb_{spref}.minimap2.bedcov", spref=['LmagMAC','LmagMIC']),
+        expand("annotation/flye-comb_{spref}/trf/flye-comb_{spref}.trf.ngs.dat", spref=['LmagMAC','LmagMIC']),
 
 rule annotation_megahit_comb:
     input:

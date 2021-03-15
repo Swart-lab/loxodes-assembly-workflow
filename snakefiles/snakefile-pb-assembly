@@ -90,6 +90,61 @@ rule sort_minimap_pb_ccs_assembly:
         "samtools sort --threads {threads} --reference {input.scaffolds} -o {output.sortbam} {input.bam} 2> {log.sort};"
         "samtools index {output.sortbam} 2> {log.index};"
 
+rule contig_gc_length:
+    input:
+        scaffolds="assembly/{assembler}-comb_{spref}/scaffolds.fasta",
+    output:
+        # tmp1=temp("annotation/{assembler}-comb_{spref}/tmp1"),
+        # tmp2=temp("annotation/{assembler}-comb_{spref}/tmp2"),
+        gcstatsorig="annotation/{assembler}-comb_{spref}/{assembler}-comb_{spref}.gcstatsorig",
+        gcstats="annotation/{assembler}-comb_{spref}/{assembler}-comb_{spref}.gcstats",
+        ctgbed="annotation/{assembler}-comb_{spref}/{assembler}-comb_{spref}.ctg.bed"
+    conda: "envs/bbmap.yml"
+    shell:
+        "stats.sh in={input.scaffolds} gc={output.gcstatsorig} gcformat=4;"
+        # "tail -n+2 {output.gcstatsorig} | cut -f1 -d\" \" > {output.tmp1};" # remove scaffold header attributes after ID
+        # "tail -n+2 {output.gcstatsorig} | cut -f2,3 > {output.tmp2};"
+        # "paste {output.tmp1} {output.tmp2} > {output.gcstats};"
+        "tail -n+2 {output.gcstatsorig} | perl -lne 'print \"$1\\t$2\\t$3\" if m/^(\S+)[^\\t]*\\t(\S+)\\t(\S+)/' > {output.gcstats}"
+        "cat {output.gcstats} | perl -lane 'print \"$F[0]\\t0\\t$F[1]\"' > {output.ctgbed};"
+
+rule contig_bedcov:
+    input:
+        sortbam="annotation/{assembler}-comb_{spref}/mapping/minimap2.{spref}_pb-ccs_vs_{assembler}-comb_{spref}.sort.bam",
+        ctgbed="annotation/{assembler}-comb_{spref}/{assembler}-comb_{spref}.ctg.bed"
+    conda: "envs/gbtquick.yml"
+    output:
+        "annotation/{assembler}-comb_{spref}/{assembler}-comb_{spref}.minimap2.bedcov"
+    shell:
+        "samtools bedcov {input.ctgbed} {input.sortbam} > {output};"
+
+rule split_fasta_for_trf:
+    # Split scaffolds into smaller chunks for running TRF
+    input: "assembly/{assembler}-comb_{sp}/scaffolds.fasta"
+    output:
+        expand("annotation/{{assembler}}-comb_{{sp}}/trf/split_fasta/trf{num}.fa",
+               num=[str(i).zfill(3) for i in range(100)])
+    params:
+        prefix="annotation/{assembler}-comb_{sp}/trf/split_fasta/trf"
+    shell:
+        "/ebio/abt2_projects/ag-swart-loxodes/opt/kentutils/faSplit sequence {input} 100 {params.prefix}"
+
+rule run_trf:
+    # Find low complexity tandem repeats
+    input: "annotation/{assembler}-comb_{sp}/trf/split_fasta/trf{num}.fa"
+    output: "annotation/{assembler}-comb_{sp}/trf/trf_out/trf{num}.trf.dat"
+    shell:
+        "/ebio/abt2_projects/ag-swart-loxodes/envs/repeats/bin/trf {input} 2 5 7 80 10 50 2000 -d -h -ngs > {output}"
+
+rule concat_trf_output:
+    # Combine split output
+    input: 
+        expand("annotation/{{assembler}}-comb_{{sp}}/trf/trf_out/trf{num}.trf.dat",
+               num=[str(i).zfill(3) for i in range(100)])
+    output: "annotation/{assembler}-comb_{sp}/trf/{assembler}-comb_{sp}.trf.ngs.dat"
+    shell:
+        "cat {input} > {output}"
+
 # Prepare files for Falcon assembly
 
 rule combine_pb_fq:
