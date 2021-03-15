@@ -11,10 +11,10 @@ rule flye_comb_ccs:
     input:
         lambda wildcards: get_pb_ccs_by_sp(wildcards.sp)
     output:
-        assembly="assembly/flye-comb_{sp}/assembly.fasta",
-        gfa="assembly/flye-comb_{sp}/assembly_graph.gfa",
-        gv="assembly/flye-comb_{sp}/assembly_graph.gv",
-        assembly_info="assembly/flye-comb_{sp}/assembly_info.txt",
+        assembly=protected("assembly/flye-comb_{sp}/assembly.fasta"),
+        gfa=protected("assembly/flye-comb_{sp}/assembly_graph.gfa"),
+        gv=protected("assembly/flye-comb_{sp}/assembly_graph.gv"),
+        assembly_info=protected("assembly/flye-comb_{sp}/assembly_info.txt"),
         scaffolds="assembly/flye-comb_{sp}/scaffolds.fasta" # alias for consistency
     threads: 16
     conda: "envs/flye.yml"
@@ -79,8 +79,8 @@ rule sort_minimap_pb_ccs_assembly:
         scaffolds="assembly/{assembler}-comb_{spref}/scaffolds.fasta",
         bam="annotation/{assembler}-comb_{spref}/mapping/minimap2.{spmap}_pb-ccs_vs_{assembler}-comb_{spref}.bam"
     output:
-        sortbam="annotation/{assembler}-comb_{spref}/mapping/minimap2.{spmap}_pb-ccs_vs_{assembler}-comb_{spref}.sort.bam",
-        index="annotation/{assembler}-comb_{spref}/mapping/minimap2.{spmap}_pb-ccs_vs_{assembler}-comb_{spref}.sort.bam.bai"
+        sortbam=protected("annotation/{assembler}-comb_{spref}/mapping/minimap2.{spmap}_pb-ccs_vs_{assembler}-comb_{spref}.sort.bam"),
+        index=protected("annotation/{assembler}-comb_{spref}/mapping/minimap2.{spmap}_pb-ccs_vs_{assembler}-comb_{spref}.sort.bam.bai")
     conda: "envs/minimap2.yml"
     threads: 8
     log:
@@ -122,7 +122,7 @@ rule split_fasta_for_trf:
     # Split scaffolds into smaller chunks for running TRF
     input: "assembly/{assembler}-comb_{sp}/scaffolds.fasta"
     output:
-        expand("annotation/{{assembler}}-comb_{{sp}}/trf/split_fasta/trf{num}.fa",
+        expand(temp("annotation/{{assembler}}-comb_{{sp}}/trf/split_fasta/trf{num}.fa"),
                num=[str(i).zfill(3) for i in range(100)])
     params:
         prefix="annotation/{assembler}-comb_{sp}/trf/split_fasta/trf"
@@ -132,7 +132,7 @@ rule split_fasta_for_trf:
 rule run_trf:
     # Find low complexity tandem repeats
     input: "annotation/{assembler}-comb_{sp}/trf/split_fasta/trf{num}.fa"
-    output: "annotation/{assembler}-comb_{sp}/trf/trf_out/trf{num}.trf.dat"
+    output: temp("annotation/{assembler}-comb_{sp}/trf/trf_out/trf{num}.trf.dat")
     shell:
         "/ebio/abt2_projects/ag-swart-loxodes/envs/repeats/bin/trf {input} 2 5 7 80 10 50 2000 -d -h -ngs > {output}"
 
@@ -144,6 +144,22 @@ rule concat_trf_output:
     output: "annotation/{assembler}-comb_{sp}/trf/{assembler}-comb_{sp}.trf.ngs.dat"
     shell:
         "cat {input} > {output}"
+
+rule filter_trf_output:
+    input:
+        scaffolds="assembly/{assembler}-comb_{sp}/scaffolds.fasta",
+        trf_raw="annotation/{assembler}-comb_{sp}/trf/{assembler}-comb_{sp}.trf.ngs.dat"
+    output:
+        gff="annotation/{assembler}-comb_{sp}/trf/{assembler}-comb_{sp}.trf.no_overlap.min{minlen}.gff3",
+        maskfasta="annotation/{assembler}-comb_{sp}/trf/{assembler}-comb_{sp}.trf.no_overlap.min{minlen}.mask.fasta",
+        mergebed="annotation/{assembler}-comb_{sp}/trf/{assembler}-comb_{sp}.trf.no_overlap.min{minlen}.merge.bed"
+    conda: "envs/barrnap.yml"
+    shell:
+#       # Repeat features at least minlen bp long
+        "/ebio/abt2_projects/ag-swart-loxodes/opt/trf_utils/trf_utils.py --input {input.trf_raw} --no_overlaps --min_length {wildcards.minlen} --outfmt gff --out {output.gff};"
+#       # Merge overlapping features and produce masked reference assembly
+        "bedtools maskfasta -fi {input.scaffolds} -bed {output.gff} -soft -fo {output.maskfasta};"
+        "bedtools merge -i {output.gff} > {output.mergebed};"
 
 # Prepare files for Falcon assembly
 
