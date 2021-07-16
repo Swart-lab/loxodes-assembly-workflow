@@ -1,0 +1,6 @@
+Script and configuration files for running Falcon and Racon on LmagMIC PacBio data.
+
+This requires some manual intervention and checking between steps, so was not included in the Snakefile.
+
+Symlink these scripts and run them from the following path:
+/ebio/abt2_projects/ag-swart-loxodes/assembly/falcon-comb_LmagMIC
