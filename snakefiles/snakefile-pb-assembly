@@ -6,6 +6,26 @@ def get_pb_ccs_by_sp(sp):
         outfiles.extend(expand(config['pb_raw'][lib]['ccs']))
     return(outfiles)
 
+def combine_illumina_trim_r1_comma_list(wildcards):
+    # Return list of interleaved Illumina reads, given wildcards
+    # lib, qtrimvals, and sp
+    r1=expand("data/reads-trim/{lib}_R1_ktrim_qtrim{qtrimvals}.fq.gz",
+               lib=config['libraries_by_sp'][wildcards.sp]['illumina-bulk'],
+               qtrimvals=wildcards.qtrimvals)
+    r1.sort()
+    r1 = [i for i in r1]
+    return ','.join(r1)
+
+def combine_illumina_trim_r2_comma_list(wildcards):
+    # Return list of interleaved Illumina reads, given wildcards
+    # lib, qtrimvals, and sp
+    r2=expand("data/reads-trim/{lib}_R2_ktrim_qtrim{qtrimvals}.fq.gz",
+               lib=config['libraries_by_sp'][wildcards.sp]['illumina-bulk'],
+               qtrimvals=wildcards.qtrimvals)
+    r2.sort()
+    r2 = [i for i in r2]
+    return ','.join(r2)
+
 rule flye_comb_ccs:
     # Combined assembly for each species, using all metagenomic libraries available for that species
     input:
@@ -89,6 +109,69 @@ rule sort_minimap_pb_ccs_assembly:
     shell:
         "samtools sort --threads {threads} --reference {input.scaffolds} -o {output.sortbam} {input.bam} 2> {log.sort};"
         "samtools index {output.sortbam} 2> {log.index};"
+
+rule bbmap_pb_ccs_assembly:
+    # Map Illumina reads to PacBio assembiles
+    input:
+        scaffolds="assembly/{assembler}-comb_{spref}/scaffolds.fasta",
+        reads=lambda wildcards: expand("data/reads-trim/{lib}_R{ori}_ktrim_qtrim{qtrimvals}.fq.gz",lib=config['libraries_by_sp'][wildcards.sp]['illumina-bulk'],qtrimvals=wildcards.qtrimvals,ori=[1,2])
+    output:
+        bam="annotation/{assembler}-comb_{spref}/mapping/bbmap.{sp}_R12_ktrim_qtrim{qtrimvals}_vs_{assembler}-comb_{spref}.bam",
+        covstats="annotation/{assembler}-comb_{spref}/mapping/bbmap.{sp}_R12_ktrim_qtrim{qtrimvals}_vs_{assembler}-comb_{spref}.covstats"
+    params:
+        r1=combine_illumina_trim_r1_comma_list,
+        r2=combine_illumina_trim_r2_comma_list
+    log: "logs/bbmap_pb_ccs_assembly.{sp}.{qtrimvals}.{assembler}.{spref}.log"
+    threads: 16
+    conda: "envs/bbmap.yml"
+    shell:
+        "bbwrap.sh ref={input.scaffolds} threads={threads} fast append nodisk in={params.r1} in2={params.r2} out={output.bam} covstats={output.covstats};"
+
+
+rule bowtie_index_pb_ccs_assembly:
+    input:
+        scaffolds="assembly/{assembler}-comb_{spref}/scaffolds.fasta"
+    output:
+        "annotation/{assembler}-comb_{spref}/mapping/{assembler}-comb_{spref}.1.bt2" # not all files listed
+    params:
+        prefix="annotation/{assembler}-comb_{spref}/mapping/{assembler}-comb_{spref}"
+    log: "logs/bowtie_index_pb_ccs_assembly.{assembler}-comb_{spref}.log"
+    threads: 16
+    conda: "envs/bowtie2.yml"
+    shell:
+        "bowtie2-build --seed 12345 --threads 16 {input.scaffolds} {params.prefix}"
+
+
+rule bowtie_map_illumina_pb_ccs_assembly:
+    input:
+        scaffolds="assembly/{assembler}-comb_{spref}/scaffolds.fasta",
+        index="annotation/{assembler}-comb_{spref}/mapping/{assembler}-comb_{spref}.1.bt2",
+        reads=lambda wildcards: expand("data/reads-trim/{lib}_R{ori}_ktrim_qtrim{qtrimvals}.fq.gz",lib=config['libraries_by_sp'][wildcards.sp]['illumina-bulk'],qtrimvals=wildcards.qtrimvals,ori=[1,2])
+    output:
+        bam=temp("annotation/{assembler}-comb_{spref}/mapping/bowtie2.{sp}_R12_ktrim_qtrim{qtrimvals}_vs_{assembler}-comb_{spref}.bam")
+    params:
+        prefix="annotation/{assembler}-comb_{spref}/mapping/{assembler}-comb_{spref}",
+        r1=combine_illumina_trim_r1_comma_list,
+        r2=combine_illumina_trim_r2_comma_list
+    log: "logs/bowtie_map_illumina_pb_ccs_assembly.{assembler}-comb_{spref}.{sp}_q{qtrimvals}.log"
+    threads: 16
+    conda: "envs/bowtie2.yml"
+    shell:
+        "bowtie2 -x {params.prefix} --threads {threads} -q -1 {params.r1} -2 {params.r2} 2> {log} | samtools view -b --reference {input.scaffolds} > {output.bam} ;"
+
+
+rule sort_bowtie_map_illumina_pb_ccs_assembly:
+    input:
+        scaffolds="assembly/{assembler}-comb_{spref}/scaffolds.fasta",
+        bam="annotation/{assembler}-comb_{spref}/mapping/bowtie2.{sp}_R12_ktrim_qtrim{qtrimvals}_vs_{assembler}-comb_{spref}.bam"
+    output:
+        sortbam=protected("annotation/{assembler}-comb_{spref}/mapping/bowtie2.{sp}_R12_ktrim_qtrim{qtrimvals}_vs_{assembler}-comb_{spref}.sort.bam"),
+        index=protected("annotation/{assembler}-comb_{spref}/mapping/bowtie2.{sp}_R12_ktrim_qtrim{qtrimvals}_vs_{assembler}-comb_{spref}.sort.bam.bai")
+    conda: "envs/bowtie2.yml"
+    threads: 16
+    shell:
+        "samtools sort --threads {threads} --reference {input.scaffolds} -o {output.sortbam} {input.bam};"
+        "samtools index {output.sortbam};"
 
 rule contig_gc_length:
     input:

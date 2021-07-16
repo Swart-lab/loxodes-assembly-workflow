@@ -21,6 +21,10 @@ rule annotation_falcon_comb:
         expand("annotation/falcon-comb_{spref}/falcon-comb_{spref}.minimap2.bedcov", spref=['LmagMAC','LmagMIC']),
         expand("annotation/falcon-comb_{spref}/trf/falcon-comb_{spref}.trf.no_overlap.min{minlen}.gff3",
                 spref=['LmagMAC','LmagMIC'], minlen=[100,1000]),
+        # expand("annotation/falcon-comb_{spref}/mapping/bbmap.{sp}_R12_ktrim_qtrim28_vs_falcon-comb_{spref}.covstats",
+        #         spref=['LmagMAC','LmagMIC'], sp=['LmagMAC','LmagMIC']),
+        expand("annotation/falcon-comb_{spref}/mapping/bowtie2.{sp}_R12_ktrim_qtrim28_vs_falcon-comb_{spref}.sort.bam",
+                spref=['LmagMAC'], sp=['LmagMAC','LmagMIC']),
 
 rule annotation_flye_comb:
     input:
@@ -35,6 +39,10 @@ rule annotation_flye_comb:
         expand("annotation/flye-comb_{spref}/flye-comb_{spref}.minimap2.bedcov", spref=['LmagMAC','LmagMIC']),
         expand("annotation/flye-comb_{spref}/trf/flye-comb_{spref}.trf.no_overlap.min{minlen}.gff3",
                 spref=['LmagMAC','LmagMIC'], minlen=[100,1000]),
+        # expand("annotation/flye-comb_{spref}/mapping/bbmap.{sp}_R12_ktrim_qtrim28_vs_flye-comb_{spref}.covstats",
+        #         spref=['LmagMAC','LmagMIC'], sp=['LmagMAC','LmagMIC']),
+        expand("annotation/flye-comb_{spref}/mapping/bowtie2.{sp}_R12_ktrim_qtrim28_vs_flye-comb_{spref}.sort.bam",
+                spref=['LmagMAC'], sp=['LmagMAC','LmagMIC']),
 
 rule annotation_megahit_comb:
     input:
