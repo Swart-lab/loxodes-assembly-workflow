@@ -107,3 +107,12 @@ We want the `get_asm_stats.py` script to parse Falcon assembly
 ```
 git clone https://github.com/PacificBiosciences/pb-assembly.git
 ```
+
+
+# tantan
+
+Installed via Conda but we need the `atMask.mat` file from the `test/` folder
+
+```
+git clone https://gitlab.com/mcfrith/tantan.git
+```
