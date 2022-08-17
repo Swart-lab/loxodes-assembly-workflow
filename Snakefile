@@ -9,6 +9,18 @@ include: "snakefiles/snakefile-reads-rnaseq-preprocess-qc"
 include: "snakefiles/snakefile-reads-rnaseq-assembly"
 
 
+rule annotation_hifiasm_comb:
+    input:
+        # expand("assembly/hifiasm-comb_{spref}/scaffolds.fasta",
+        #         spref=['LmagMAC','LmagMIC']),
+        expand("annotation/hifiasm-comb_{spref}/mapping/minimap2.{spmap}_pb-ccs_vs_hifiasm-comb_{spref}.sort.bam",
+                spref=['LmagMAC','LmagMIC'], spmap=['LmagMAC','LmagMIC']),
+        expand("annotation/hifiasm-comb_{spref}/mapping/hisat2.{lib}_q28_nochlamy.hifiasm-comb_{spref}.sort.bam.bai",
+                spref=['LmagMAC','LmagMIC'],lib=config["libraries_rnaseq"]),
+        expand("annotation/hifiasm-comb_{spref}/trf/hifiasm-comb_{spref}.trf.no_overlap.min{minlen}.gff3",
+                spref=['LmagMAC','LmagMIC'], minlen=[100,1000]),
+
+
 rule annotation_falcon_comb:
     # Falcon assembly step not under snakemake control because manual interventions required
     input:
@@ -25,6 +37,7 @@ rule annotation_falcon_comb:
         #         spref=['LmagMAC','LmagMIC'], sp=['LmagMAC','LmagMIC']),
         expand("annotation/falcon-comb_{spref}/mapping/bowtie2.{sp}_R12_ktrim_qtrim28_vs_falcon-comb_{spref}.sort.bam",
                 spref=['LmagMAC'], sp=['LmagMAC','LmagMIC']),
+
 
 rule annotation_flye_comb:
     input:

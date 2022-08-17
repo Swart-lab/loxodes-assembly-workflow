@@ -1,0 +1,9 @@
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - hifiasm=0.15.5
+  - minimap2
+  - gfatools=0.5
+  - samtools

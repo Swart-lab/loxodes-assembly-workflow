@@ -26,6 +26,24 @@ def combine_illumina_trim_r2_comma_list(wildcards):
     r2 = [i for i in r2]
     return ','.join(r2)
 
+rule hifiasm_comb_ccs:
+    # Combined assembly for each species with all CCS libraries for that species
+    input:
+        lambda wildcards: get_pb_ccs_by_sp(wildcards.sp)
+    output:
+        gfa=protected("assembly/hifiasm-comb_{sp}/{sp}.asm.bp.p_ctg.gfa"),
+        fasta=protected("assembly/hifiasm-comb_{sp}/{sp}.asm.bp.p_ctg.fasta"),
+        scaffolds="assembly/hifiasm-comb_{sp}/scaffolds.fasta" # alias for consistency
+    threads: 16
+    conda: "envs/hifiasm.yml"
+    params:
+        prefix="assembly/hifiasm-comb_{sp}/{sp}.asm"
+    log: "assembly/hifiasm-comb_{sp}/{sp}.asm.hifiasm.log"
+    shell:
+        "hifiasm -o {params.prefix} -t {threads} {input} &> {log};"
+        "gfatools gfa2fa {output.gfa} > {output.fasta};" # Convert GFA to Fasta
+        "ln -sr {output.fasta} {output.scaffolds}" # -r relative link, else rule breaks
+
 rule flye_comb_ccs:
     # Combined assembly for each species, using all metagenomic libraries available for that species
     input:
