@@ -8,8 +8,8 @@ rule combine_reads:
         fwd=lambda wildcards: config['reads_raw'][wildcards.lib]['fwd'],
         rev=lambda wildcards: config['reads_raw'][wildcards.lib]['rev']
     output:
-        fwd="data/reads-combine/{lib}_R1.fq.gz",
-        rev="data/reads-combine/{lib}_R2.fq.gz"
+        fwd=temp("data/reads-combine/{lib}_R1.fq.gz"),
+        rev=temp("data/reads-combine/{lib}_R2.fq.gz")
     conda: "envs/bbmap.yml"
     threads: 8
     params:
